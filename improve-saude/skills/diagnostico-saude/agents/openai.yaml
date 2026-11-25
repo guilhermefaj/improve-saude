@@ -1,0 +1,4 @@
+interface:
+  display_name: "Diagnóstico de Saúde Pública"
+  short_description: "Conversa com quem faz a gestão da saúde do município, lê as planilhas sem expor dados pessoais, cruza com dados públicos (IBGE, Siconfi, CNES, InfoDengue) e entrega um PDF com a marca Improve Business."
+  default_prompt: "Quero um diagnóstico da saúde do meu município."

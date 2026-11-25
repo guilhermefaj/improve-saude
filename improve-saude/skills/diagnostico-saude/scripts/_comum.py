@@ -1,11 +1,11 @@
 """Funções comuns aos scripts da skill Diagnóstico de Saúde Pública (Improve).
 
 Regra central: todo número que aparece no documento nasce aqui, num script,
-e fica gravado em evidencias.json com fonte, período e origem. O Claude não
+e fica gravado em evidencias.json com fonte, período e origem. O agente não
 digita números no documento: ele cita {{id}}.
 
-Só biblioteca padrão do Python (3.8+), para rodar no Claude Code, no Cowork e
-no sandbox do Claude.ai sem instalar nada.
+Só biblioteca padrão do Python (3.9+), para rodar em qualquer agente (Claude,
+Codex, ChatGPT) e em ambientes de código na nuvem sem instalar nada.
 """
 import json
 import os
@@ -28,8 +28,8 @@ VERSAO_EVIDENCIAS = 1
 
 # --------------------------------------------------------------------- rede
 class SemRede(Exception):
-    """A fonte não respondeu. No chat do Claude.ai isso é esperado: o sandbox
-    costuma bloquear sites do governo."""
+    """A fonte não respondeu. Em chats na nuvem e no Codex com a rede
+    desligada isso é esperado: o ambiente bloqueia sites do governo."""
 
 
 def get_json(url, params=None, tentativas=3, timeout=60):
@@ -164,5 +164,5 @@ def serie(ev, id_, rotulo, unidade, fonte, url, origem, pontos, casas=None, **ex
 
 
 def resumo(registrado):
-    """Linha curta para o Claude ler no terminal, sem despejar JSON."""
+    """Linha curta para o agente ler no terminal, sem despejar JSON."""
     return f"{registrado['rotulo']}: {registrado['fmt']} ({registrado.get('periodo') or 's/d'}; {registrado['fonte']})"

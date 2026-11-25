@@ -32,4 +32,14 @@ Use quando a dor pedir e a pessoa aceitar uma análise menos direta. Por enquant
 
 ## Rede bloqueada
 
-No chat do Claude.ai, o ambiente que roda os scripts costuma bloquear sites do governo. `fontes.py` avisa com uma mensagem clara. Nesse caso, siga só com arquivos e relatos e diga isso no documento. No Claude Code e no Cowork (aplicativo de desktop), a rede costuma estar liberada.
+`fontes.py` avisa com uma mensagem clara quando não alcança a fonte. O que fazer depende do ambiente:
+
+- **Claude Code e Cowork:** a rede costuma estar liberada.
+- **Codex:** o modo padrão desliga a rede dos comandos. Peça para rodar `fontes.py` com acesso à internet (a pessoa aprova na hora) ou explique como liberar de vez, no `~/.codex/config.toml`:
+
+  ```toml
+  [sandbox_workspace_write]
+  network_access = true
+  ```
+
+- **Chat na nuvem (Claude.ai, ChatGPT):** o ambiente costuma bloquear sites do governo. Siga só com arquivos e relatos e diga isso no documento.

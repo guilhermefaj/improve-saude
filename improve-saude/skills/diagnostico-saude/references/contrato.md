@@ -5,7 +5,7 @@ O documento nasce de dois arquivos na pasta de trabalho da conversa. Os dois sã
 | Arquivo | Quem escreve | O que guarda |
 |---|---|---|
 | `evidencias.json` | **Só os scripts** (`fontes.py`, `arquivo.py`, `evidencias.py`) | Todos os números, cada um com fonte, período, link e origem |
-| `documento.json` | **O Claude** | O texto: insights em ordem de importância, citando números só como `{{id}}` |
+| `documento.json` | **O agente** | O texto: insights em ordem de importância, citando números só como `{{id}}` |
 
 `renderizar.py` junta os dois e gera o HTML com a marca Improve. Antes disso, `checagem.py` recusa o documento se houver um número escrito à mão, um `{{id}}` que não existe ou um insight mal formado.
 

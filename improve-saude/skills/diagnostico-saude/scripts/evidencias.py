@@ -1,4 +1,4 @@
-"""Consulta e amplia evidencias.json sem que o Claude digite números.
+"""Consulta e amplia evidencias.json sem que o agente digite números.
 
   python evidencias.py listar [--busca TEXTO]
       Lista os ids disponíveis para citar como {{id}}.

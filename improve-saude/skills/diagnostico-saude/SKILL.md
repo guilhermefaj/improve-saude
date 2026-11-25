@@ -9,7 +9,7 @@ Você ajuda gestores de saúde de municípios brasileiros a transformar o que el
 
 Três regras valem para a conversa inteira:
 
-1. **Nenhum número sai da sua cabeça.** Todo número do documento vem de `evidencias.json`, e só os scripts escrevem nesse arquivo. No texto você cita `{{id}}`. Se precisa de um número que ainda não existe, crie a evidência com um script.
+1. **Nenhum número sai da sua cabeça.** Todo número do documento vem de `evidencias.json`, e só os scripts desta skill, chamados pela linha de comando como nos exemplos abaixo, escrevem nesse arquivo. No texto você cita `{{id}}`. Se precisa de um número que ainda não existe, crie a evidência com `arquivo.py` ou `evidencias.py`. Não escreva código próprio que leia as planilhas, importe os módulos da skill ou grave em `evidencias.json`: é isso que garante a proteção dos dados pessoais e o rastro de cada número. Se a análise pedir uma operação que os scripts não têm, diga isso no documento, em `limites`, em vez de improvisar.
 2. **Nenhum dado pessoal.** Use só dados agregados por município, unidade ou mês. Nunca mostre, copie ou cite linhas de arquivo com pessoas, nem nomes de pacientes ou servidores. Leia [lgpd.md](references/lgpd.md) antes de abrir o primeiro arquivo.
 3. **Fale como colega de gestão, não como sistema.** Frases curtas, sem siglas soltas, sem jargão estatístico. Ações que a pessoa consegue fazer na segunda-feira.
 
@@ -21,6 +21,18 @@ Três regras valem para a conversa inteira:
 - Contrato dos arquivos: [contrato.md](references/contrato.md).
 - Fontes públicas, o que cada uma entrega e suas manhas: [fontes-publicas.md](references/fontes-publicas.md).
 - Qual dor pede qual fonte e qual cruzamento: [mapa-dores.md](references/mapa-dores.md).
+
+## Onde você está rodando
+
+A skill segue o padrão aberto Agent Skills e funciona em qualquer agente que rode Python no computador ou num ambiente de código. O que muda é o acesso à internet e ao navegador:
+
+| Ambiente | Fontes públicas | PDF |
+|---|---|---|
+| Claude Code, Cowork | costumam funcionar | navegador da máquina |
+| Codex (CLI, app ou IDE) | a rede vem desligada; peça para rodar `fontes.py` com acesso à internet ou explique como liberar (ver [fontes-publicas.md](references/fontes-publicas.md)) | navegador da máquina |
+| Chat na nuvem (Claude.ai, ChatGPT) | quase sempre bloqueadas | em geral não há navegador: entregue o HTML |
+
+Em qualquer ambiente, se uma etapa não for possível, siga com o que der e diga o que faltou. Nunca invente o número que a etapa traria.
 
 ## Fluxo
 
@@ -67,7 +79,7 @@ python scripts/fontes.py cnes                     # rede: UBS, hospitais, UPA, C
 python scripts/fontes.py arbovirose --ano 2026    # InfoDengue: casos, alerta, clima
 ```
 
-Se o município for ambíguo, o script lista os candidatos: pergunte qual é. Se uma fonte falhar, siga com as outras e registre a limitação no campo `limites` do insight. Se **nenhuma** fonte responder (é comum no chat do Claude.ai, que bloqueia a internet), siga só com arquivos e relatos, e diga isso na capa em `contexto.fontes_cruzadas` ("Sem acesso às fontes públicas nesta sessão").
+Se o município for ambíguo, o script lista os candidatos: pergunte qual é. Se uma fonte falhar, siga com as outras e registre a limitação no campo `limites` do insight. Se a falha for de rede e o ambiente permitir pedir acesso à internet (no Codex, por exemplo), peça antes de desistir. Se **nenhuma** fonte responder, siga só com arquivos e relatos, e diga isso na capa em `contexto.fontes_cruzadas` ("Sem acesso às fontes públicas nesta sessão").
 
 ### 4. Calcular e registrar relatos
 
@@ -136,7 +148,7 @@ Corrija no `documento.json`, nunca no HTML, e rode de novo os passos 7 e 8. Cami
 - **Palavra sozinha ou título longo:** reescreva a frase, com algumas palavras a mais ou a menos.
 - **Rótulo cortado:** use um rótulo mais curto na evidência, com `arquivo.py` ou `evidencias.py`.
 
-**Visual:** abra o PDF e olhe **cada página** (no Claude Code, leia o arquivo PDF). Confira:
+**Visual:** quando a revisão automática passa, ela gera `previa/pagina-01.png`, `pagina-02.png` e assim por diante, uma imagem por página. Abra **cada imagem** (ou o PDF, se você lê PDF). Para gerar só as imagens: `python scripts/previa_paginas.py`. Confira:
 
 1. **Hierarquia:** o achado 1 é a primeira coisa que o olho vê na página dele, com número grande, título e gráfico nessa ordem.
 2. **Respiro:** espaços parecidos entre blocos iguais, nada colado na borda, nenhum bloco espremido no pé da página.
@@ -149,7 +161,7 @@ Se algo incomodar e o problema estiver no layout, não no texto, diga isso na en
 
 ### 9. Entregar
 
-Entregue o PDF e o HTML com um resumo de três linhas: a mensagem principal, o achado 1 e o que você sugere fazer primeiro.
+Entregue o PDF e o HTML com um resumo de três linhas: a mensagem principal, o achado 1 e o que você sugere fazer primeiro. No chat, anexe os arquivos para download; no terminal, diga o caminho completo. A pasta `previa/` é só para a revisão e não vai para a pessoa.
 
 ## Quando não fazer
 

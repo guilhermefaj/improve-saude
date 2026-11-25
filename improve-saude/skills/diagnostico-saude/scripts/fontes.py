@@ -277,8 +277,8 @@ def main():
         {"municipio": cmd_municipio, "populacao": cmd_populacao, "financas": cmd_financas,
          "cnes": cmd_cnes, "arbovirose": cmd_arbovirose}[a.cmd](a, ev)
     except c.SemRede as e:
-        sys.exit(f"FONTE INDISPONÍVEL: {e}\nSe você está no chat do Claude.ai, o ambiente provavelmente bloqueia sites do governo. "
-                 "Siga só com os arquivos enviados e diga isso no documento.")
+        sys.exit(f"FONTE INDISPONÍVEL: {e}\nSe o ambiente bloqueia a internet (chat na nuvem ou Codex com a rede desligada), "
+                 "peça acesso à rede se puder; se não, siga só com os arquivos enviados e diga isso no documento.")
     c.salvar(ev, a.evidencias)
 
 

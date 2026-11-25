@@ -5,7 +5,7 @@
 
 Roda a checagem antes e recusa gerar se ela reprovar. Os números entram pelo
 `fmt` de cada evidência; os gráficos são SVG desenhados aqui, a partir das
-evidências. O Claude não toca em número nenhum nesta etapa.
+evidências. O agente não toca em número nenhum nesta etapa.
 
 Hierarquia visual: o insight de prioridade 1 ganha uma página inteira; os de
 prioridade 2 e 3, meia página com gráfico; os demais, uma lista compacta.

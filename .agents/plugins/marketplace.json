@@ -1,0 +1,20 @@
+{
+  "name": "improve-gestao-publica",
+  "interface": {
+    "displayName": "Improve · Gestão Pública"
+  },
+  "plugins": [
+    {
+      "name": "improve-saude",
+      "source": {
+        "source": "local",
+        "path": "./improve-saude"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_USE"
+      },
+      "category": "Productivity"
+    }
+  ]
+}

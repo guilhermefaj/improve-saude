@@ -3,7 +3,7 @@
   python checagem.py [--documento documento.json] [--evidencias evidencias.json]
 
 Sai com código 0 se estiver tudo certo. Caso contrário, lista cada problema
-com o campo e o trecho, para o Claude corrigir e rodar de novo.
+com o campo e o trecho, para o agente corrigir e rodar de novo.
 
 Regra: o texto cita números só como {{id}}. Fora dos marcadores, passam apenas
 contagens de 1 a 10 sem unidade ("três UBS", "2 temas") e anos de 1990 a 2040.

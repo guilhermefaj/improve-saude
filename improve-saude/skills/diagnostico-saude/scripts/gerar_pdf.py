@@ -40,14 +40,32 @@ def navegadores():
     return achados
 
 
-def rodar(exe, args, timeout=120):
-    """Roda o navegador headless com um perfil temporário e devolve o processo concluído."""
+# Alguns agentes rodam os comandos dentro de um sandbox próprio (o Codex no Windows,
+# por exemplo). Ali o sandbox do Chrome não consegue subir e o navegador cai na
+# hora. Nesse caso tentamos de novo sem ele. O navegador só abre o HTML que o
+# renderizador acabou de gerar e as fontes da marca.
+SEM_SANDBOX = ["--no-sandbox"]
+_extra = []
+
+
+def _rodar(exe, args, timeout):
     perfil = tempfile.mkdtemp(prefix="improve-nav-")
     try:
         return subprocess.run([exe, *BASE, f"--user-data-dir={perfil}", *args],
                               capture_output=True, text=True, encoding="utf-8", errors="replace", timeout=timeout)
     finally:
         shutil.rmtree(perfil, ignore_errors=True)
+
+
+def rodar(exe, args, timeout=120):
+    """Roda o navegador headless com um perfil temporário e devolve o processo concluído."""
+    r = _rodar(exe, _extra + args, timeout)
+    if r.returncode != 0 and not _extra:
+        r2 = _rodar(exe, SEM_SANDBOX + args, timeout)
+        if r2.returncode == 0:
+            _extra[:] = SEM_SANDBOX
+        return r2
+    return r
 
 
 def _imprimir(exe, html, saida):

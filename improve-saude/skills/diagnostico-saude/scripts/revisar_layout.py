@@ -19,7 +19,8 @@ A4, mede cada bloco e aponta:
     - rótulo de gráfico encurtado com reticências.
 
 Sai com código 0 se não houver problema, 1 se houver. Cada item diz onde está
-e o que fazer. A revisão automática não substitui olhar o PDF página a página.
+e o que fazer. Quando passa, gera a prévia em PNG (previa/pagina-NN.png) para a
+revisão visual, que continua obrigatória.
 """
 import argparse
 import json
@@ -221,7 +222,15 @@ def main():
     if problemas:
         print("\nREVISÃO REPROVADA. Corrija o documento.json, rode checagem, renderizar, gerar_pdf e esta revisão de novo.")
         sys.exit(1)
-    print("\nRevisão automática OK. Agora olhe o PDF página por página (lista no SKILL.md).")
+    print("\nRevisão automática OK.")
+    try:
+        from previa_paginas import gerar_previa
+        feitas = gerar_previa(a.html, os.path.join(os.path.dirname(os.path.abspath(a.html)), "previa"))
+        print("Agora abra cada imagem e faça a revisão visual (lista no SKILL.md):")
+        for caminho, nome, _ in feitas:
+            print(f"  - {caminho}  {nome}")
+    except Exception as e:  # noqa: BLE001
+        print(f"Não consegui gerar a prévia em PNG ({e}). Faça a revisão visual direto no PDF, página por página.")
 
 
 if __name__ == "__main__":
