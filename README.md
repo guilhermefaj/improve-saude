@@ -14,17 +14,17 @@ Todo número do documento vem de uma fonte identificada. Uma checagem automátic
 ### Claude Code
 
 ```
-/plugin marketplace add ENDERECO-DO-REPOSITORIO
+/plugin marketplace add guilhermefaj/improve-saude
 /plugin install improve-saude@improve-gestao-publica
 ```
 
 ### Cowork (aplicativo de desktop)
 
-Adicione o marketplace pelo endereço do repositório nas configurações de plugins e instale **improve-saude**.
+Adicione o marketplace `guilhermefaj/improve-saude` nas configurações de plugins e instale **improve-saude**.
 
 ### Claude.ai (navegador)
 
-1. Compacte a pasta `improve-saude/skills/diagnostico-saude` em um `.zip`.
+1. Baixe este repositório e compacte a pasta `improve-saude/skills/diagnostico-saude` em um `.zip`.
 2. Em Configurações > Capacidades, ative a execução de código e envie o `.zip` em Skills.
 
 No Claude.ai, o ambiente que roda os scripts costuma bloquear os sites do governo. A skill funciona, mas só com os arquivos que você enviar e com o que você contar; o documento avisa isso. Para cruzar com os dados públicos, use o Cowork ou o Claude Code.
