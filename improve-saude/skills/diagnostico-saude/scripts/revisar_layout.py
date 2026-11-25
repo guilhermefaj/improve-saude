@@ -60,7 +60,7 @@ MEDIDOR = r"""
   });
 
   // linhas de texto, palavra por palavra
-  const SEL = "h1,h2,h3,h4,p,li,td,.mensagem,.kpi-rot,.kpi-per,.sec-rot,.legenda-num,.legenda-graf,.sub,.kicker,.contexto > div,.fonte-mini,.formula";
+  const SEL = "h1,h2,h3,h4,p,li,td,.mensagem,.kpi-rot,.kpi-per,.sec-rot,.legenda-num,.legenda-graf,.titulo-graf,.sub,.kicker,.contexto > div,.fonte-mini,.formula";
   const LIM = [["h1", 1], [".manchete", 3], [".hero-titulo", 2], [".sec h3", 2], [".topo h2", 1], [".kpi-rot", 3], [".compactos strong", 2]];
   for (const el of document.querySelectorAll(SEL)) {
     if (el.querySelector("p,ul,ol,div,table,svg")) continue;   // só blocos de texto "folha"

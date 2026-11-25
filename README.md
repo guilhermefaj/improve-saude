@@ -27,7 +27,7 @@
 </p>
 
 <p align="center">
-  <a href="docs/exemplo-diagnostico.pdf"><img src="docs/exemplo-paginas.png" alt="Capa, achado principal e outros achados de um diagnóstico de exemplo"></a><br>
+  <a href="docs/exemplo-diagnostico.pdf"><img src="docs/exemplo-paginas.png" alt="Achado principal, outros achados e próximos passos de um diagnóstico de exemplo, com gráficos de barras, cascata, linha, proporção, referência e composição"></a><br>
   <sub>Exemplo gerado pelo plugin com planilhas fictícias e dados públicos reais. <a href="docs/exemplo-diagnostico.pdf">Veja o PDF completo</a>.</sub>
 </p>
 
@@ -49,7 +49,7 @@ flowchart TB
   A1 --> E
   L --> E["Evidências: cada número<br>com fonte e período"]
   F1 & F2 & F3 & F4 --> E
-  E --> R["Achados escritos<br>citando as evidências"]
+  E --> R["Achados e gráficos<br>citando as evidências"]
   R --> C{"Algum número fora<br>das evidências?"}
   C -- "sim: volta e corrige" --> R
   C -- "não" --> D["PDF em ordem<br>de importância"]
@@ -62,6 +62,7 @@ flowchart TB
 - **Cada número tem origem.** Os valores saem de scripts que consultam as fontes ou leem seus arquivos, e o texto só cita esses valores. As últimas páginas do PDF dizem de onde veio cada um.
 - **Número inventado não passa.** Uma checagem automática recusa o documento se aparecer um valor que não saiu dos dados.
 - **O mais importante ganha espaço.** O achado principal ocupa uma página inteira, com gráfico e ações. Os dois seguintes ganham meia página cada, e os demais entram numa lista.
+- **Gráfico escolhido pela mensagem.** Cada achado ganha o gráfico que mostra o seu ponto: barras para comparar, linha para o tempo, cascata para o que se perdeu no caminho, referência para metas e limites, composição para as partes de um todo. O título do gráfico diz a conclusão e a cor marca só o que o texto comenta, como propõe *Storytelling with Data*.
 - **Privacidade por padrão.** O documento usa só totais por município, unidade ou mês. CPF, nome e telefone são detectados e nunca aparecem.
 - **Roda na sua máquina, de graça.** Os scripts são Python puro, sem pacotes para instalar, e o PDF é montado pelo seu próprio navegador. O diagnóstico é automático e gratuito, e o documento avisa que não é uma consultoria contratada.
 
@@ -201,7 +202,7 @@ improve-saude/
   skills/diagnostico-saude/
     SKILL.md                           o fluxo que o assistente segue (padrão Agent Skills)
     agents/openai.yaml                 nome e descrição da skill no Codex
-    references/                        contrato dos arquivos, fontes, mapa de dores, LGPD
+    references/                        contrato dos arquivos, fontes, mapa de dores, gráficos, LGPD
     scripts/                           coleta, leitura de arquivos, checagem, HTML e PDF
     assets/                            logo da Improve e o exemplo fictício do autoteste
 ```

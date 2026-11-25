@@ -12,7 +12,7 @@
       "name": "improve-saude",
       "source": "./improve-saude",
       "description": "Diagnóstico de saúde pública municipal com dados abertos e PDF com a marca Improve.",
-      "version": "0.5.0",
+      "version": "0.6.0",
       "category": "produtividade"
     }
   ]

@@ -35,10 +35,79 @@ def textos(doc):
                 yield from campo(f"{caminho}[{i}]", x)
         elif isinstance(v, dict):
             for k, x in v.items():
-                if k in ("destaque", "evidencias", "grafico", "tipo", "confianca", "prioridade"):
+                if k == "grafico" and isinstance(x, dict):  # do gráfico, só o título e os rótulos são texto
+                    yield from campo(f"{caminho}.grafico.titulo", x.get("titulo"))
+                    for i, r in (x.get("rotulos") or {}).items():
+                        yield from campo(f"{caminho}.grafico.rotulos.{i}", r)
+                    continue
+                if k in ("destaque", "evidencias", "tipo", "confianca", "prioridade"):
                     continue
                 yield from campo(f"{caminho}.{k}" if caminho else k, x)
     yield from campo("", doc)
+
+
+GRAFICOS = {"barras", "serie", "linha", "composicao", "cascata", "referencia", "proporcao"}
+GRAFICOS_LISTA = {"composicao", "referencia", "proporcao"}  # cabem numa linha da lista compacta
+
+
+def checar_grafico(g, p, prioridade, itens, series, exige):
+    """Regras de cada tipo de gráfico (ver references/visualizacao.md)."""
+    tipo = g.get("tipo")
+    if tipo not in GRAFICOS:
+        exige(False, f"{p}.grafico.tipo deve ser um de: {', '.join(sorted(GRAFICOS))}")
+        return
+    if (prioridade or 0) > 3:
+        exige(tipo in GRAFICOS_LISTA, f"{p}.grafico: na lista compacta (prioridade 4 em diante) use {', '.join(sorted(GRAFICOS_LISTA))} ou tire o gráfico")
+    ids = list(g.get("itens") or []) + [g[k] for k in ("item", "inicio", "fim", "referencia") if g.get(k)]
+    passos = [x if isinstance(x, dict) else {"id": x} for x in g.get("passos") or []]
+    ids += [x.get("id") for x in passos] + list(g.get("marcos") or [])
+    faltam = [x for x in ids if x not in itens]
+    exige(not faltam, f"{p}.grafico: ids inexistentes em evidencias {faltam}")
+    if faltam:
+        return
+    exige(all(isinstance(itens[x]["valor"], (int, float)) for x in ids), f"{p}.grafico: item sem valor numérico")
+    unidades = {itens[x]["unidade"] for x in ids}
+    if g.get("titulo") is not None:
+        exige(isinstance(g["titulo"], str) and len(g["titulo"]) <= 80, f"{p}.grafico.titulo: texto de até 80 caracteres")
+    for k, r in (g.get("rotulos") or {}).items():
+        exige(k in ids, f"{p}.grafico.rotulos: {k!r} não está no gráfico")
+        exige(isinstance(r, str) and len(r) <= 30, f"{p}.grafico.rotulos.{k}: até 30 caracteres")
+
+    if tipo in ("serie", "linha"):
+        s = series.get(g.get("serie"))
+        exige(s is not None, f"{p}.grafico.serie inexistente: {g.get('serie')!r}")
+        if s is not None and g.get("referencia"):
+            exige(itens[g["referencia"]]["unidade"] == s.get("unidade"), f"{p}.grafico.referencia: unidade diferente da série")
+    elif tipo == "barras" and g.get("serie"):
+        s = series.get(g["serie"])
+        exige(s is not None, f"{p}.grafico.serie inexistente: {g.get('serie')!r}")
+        exige(s is None or 2 <= len(s["pontos"]) <= 12, f"{p}.grafico: barras de série pedem de 2 a 12 pontos")
+    elif tipo == "barras":
+        exige(2 <= len(g.get("itens") or []) <= 8, f"{p}.grafico.itens: de 2 a 8 itens")
+        exige(len(unidades) <= 1, f"{p}.grafico: barras com unidades diferentes {sorted(unidades)}")
+    elif tipo == "composicao":
+        ids_ = g.get("itens") or []
+        exige(2 <= len(ids_) <= 6, f"{p}.grafico.itens: composição pede de 2 a 6 partes")
+        exige(len(unidades) <= 1, f"{p}.grafico: partes com unidades diferentes {sorted(unidades)}")
+        exige(all(itens[x]["valor"] >= 0 for x in ids_), f"{p}.grafico: composição não aceita parte negativa")
+        if unidades == {"%"}:
+            soma = sum(itens[x]["valor"] for x in ids_)
+            exige(97 <= soma <= 103, f"{p}.grafico: as partes em % somam {c.fmt_num(soma, 1)}, não 100; use as partes de um mesmo todo")
+    elif tipo == "cascata":
+        exige(g.get("inicio") and g.get("fim") and 1 <= len(passos) <= 4, f"{p}.grafico: cascata pede inicio, fim e de 1 a 4 passos")
+        exige(all(x.get("sinal", "-") in ("+", "-") for x in passos), f"{p}.grafico.passos: sinal deve ser '+' ou '-'")
+        exige(len(unidades) <= 1, f"{p}.grafico: cascata com unidades diferentes {sorted(unidades)}")
+        if g.get("inicio") and g.get("fim"):
+            conta = itens[g["inicio"]]["valor"] + sum((1 if x.get("sinal", "-") == "+" else -1) * itens[x["id"]]["valor"] for x in passos)
+            fim = itens[g["fim"]]["valor"]
+            exige(abs(conta - fim) <= 0.01 * max(abs(fim), abs(itens[g["inicio"]]["valor"]), 1),
+                  f"{p}.grafico: a cascata não fecha (início e passos dão {c.fmt_num(conta, 1)}, o fim é {c.fmt_num(fim, 1)})")
+    elif tipo == "referencia":
+        exige(g.get("item") and 1 <= len(g.get("marcos") or []) <= 3, f"{p}.grafico: referência pede item e de 1 a 3 marcos")
+        exige(len(unidades) <= 1, f"{p}.grafico: item e marcos com unidades diferentes {sorted(unidades)}")
+    elif tipo == "proporcao":
+        exige(g.get("item") and itens[g["item"]]["unidade"] == "%" and 0 <= itens[g["item"]]["valor"] <= 100,
+              f"{p}.grafico: proporção pede um item em % entre 0 e 100")
 
 
 def checar(doc, ev):
@@ -65,22 +134,7 @@ def checar(doc, ev):
         exige(len(i.get("acoes") or []) <= 3, f"{p}.acoes: no máximo 3")
         g = i.get("grafico")
         if g:
-            if g.get("tipo") == "serie":
-                exige(g.get("serie") in series, f"{p}.grafico.serie inexistente: {g.get('serie')!r}")
-            elif g.get("tipo") == "barras" and g.get("serie"):
-                s = series.get(g["serie"])
-                exige(s is not None, f"{p}.grafico.serie inexistente: {g.get('serie')!r}")
-                exige(s is None or 2 <= len(s["pontos"]) <= 12, f"{p}.grafico: barras de série pedem de 2 a 12 pontos")
-            elif g.get("tipo") == "barras":
-                ids = g.get("itens") or []
-                exige(2 <= len(ids) <= 8, f"{p}.grafico.itens: de 2 a 8 itens")
-                faltam = [x for x in ids if x not in itens]
-                exige(not faltam, f"{p}.grafico.itens inexistentes: {faltam}")
-                unidades = {itens[x]["unidade"] for x in ids if x in itens}
-                exige(len(unidades) <= 1, f"{p}.grafico: barras com unidades diferentes {sorted(unidades)}")
-                exige(all(isinstance(itens[x]["valor"], (int, float)) for x in ids if x in itens), f"{p}.grafico: item sem valor numérico")
-            else:
-                problemas.append(f"{p}.grafico.tipo deve ser 'serie' ou 'barras'")
+            checar_grafico(g, p, i.get("prioridade"), itens, series, exige)
     # ---------- números instáveis (taxa sobre poucos casos) precisam de aviso no próprio insight
     for n, i in enumerate(ins):
         citados = {mt.group(1) for _, s in textos(i) for mt in MARCADOR.finditer(s)}

@@ -163,7 +163,7 @@ Siga o [contrato](references/contrato.md). Pontos que mais erram:
 - Hipóteses ficam em `hipoteses`, nunca no `achado`.
 - Use `"ficticio": true` só em testes e demonstrações com dados inventados.
 - Em `contexto.material_recebido` e `contexto.fontes_cruzadas`, escreva cada item como "Rótulo: descrição" ("IBGE: população estimada"). A capa mostra o rótulo em negrito e a descrição embaixo. Se a pessoa não enviou nada, deixe `material_recebido` vazio: a capa escreve "Só a conversa."
-- Gráfico só quando ele mostra um contraste que o texto não mostra sozinho. Duas barras com 1 e 0, ou números todos pequenos, não pedem gráfico: deixe `grafico` de fora e o número grande fala por si.
+- Gráficos: escolha o tipo pela frase que o gráfico precisa provar (comparar, evolução, partes de um todo, do valor cheio ao que sobrou, contra um limite). Dê a ele um `titulo` com a conclusão e ponha em `realce` só o que o texto comenta. Veja o [guia de visualização](references/visualizacao.md). Se não há contraste a mostrar, deixe `grafico` de fora: o número grande fala por si.
 
 ### 7. Checar e gerar
 
@@ -205,7 +205,7 @@ Corrija no `documento.json`, nunca no HTML, e rode de novo os passos 7 e 8. Cami
 1. **Hierarquia:** o achado 1 é a primeira coisa que o olho vê na página dele, com número grande, título e gráfico nessa ordem.
 2. **Respiro:** espaços parecidos entre blocos iguais, nada colado na borda, nenhum bloco espremido no pé da página.
 3. **Quebras:** nenhuma linha começando com pontuação, nenhum número separado da unidade, nenhum título quebrado de um jeito que mude o sentido.
-4. **Gráficos:** eixos legíveis, rótulos inteiros, a barra ou o ponto em destaque é o que o texto comenta.
+4. **Gráficos:** o título do gráfico diz a conclusão, os rótulos estão inteiros, e o laranja está no que o texto comenta.
 5. **Capa:** a conclusão cabe no olhar, os três números da faixa batem com os achados 1 a 3, e o "Preparado para" está no pé.
 6. **Consistência:** mesmo nome para a mesma coisa em todas as páginas ("UBS", não "unidade" num lugar e "posto" em outro).
 

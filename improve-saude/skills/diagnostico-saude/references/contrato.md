@@ -68,7 +68,8 @@ Um item pode trazer `instavel` (texto): a taxa ou o percentual foi calculado sob
       "cruzamento": "Despesa por subfunção (Siconfi) com a rede de UBS (CNES)",
       "implicacao": "A falta de profissionais relatada pode ter raiz orçamentária, e não só de contratação.",
       "acoes": ["Levantar o custo de cada equipe de saúde da família em 2025"],
-      "grafico": {"tipo": "barras", "itens": ["desp_ab_liq", "desp_hosp_liq", "desp_adm_liq"]},
+      "grafico": {"tipo": "barras", "itens": ["desp_ab_liq", "desp_hosp_liq", "desp_adm_liq"], "realce": "desp_ab_liq",
+                  "titulo": "A atenção básica fica atrás do hospital e da administração"},
       "evidencias": ["ab_part_pct", "desp_ab_liq", "desp_saude_liq"],
       "confianca": "alta",
       "limites": "A despesa por subfunção depende de como a contabilidade classifica cada gasto."
@@ -87,15 +88,41 @@ Um item pode trazer `instavel` (texto): a taxa ou o percentual foi calculado sob
   - contagens de 1 a 10 escritas sem unidade ("três UBS", "2 temas");
   - anos entre 1990 e 2040.
 - **`prioridade`** começa em 1 e não se repete. O insight 1 ganha a página de destaque, o 2 e o 3 ganham meia página com gráfico, e os demais entram em lista compacta. Use de 1 a 6 insights.
-- **Campos de referência.** `destaque`, `evidencias` e `grafico.itens` apontam para ids de `itens`. `grafico.serie` aponta para um id de `series`.
-- **Gráfico** (opcional) tem três formas:
-  - `{"tipo": "serie", "serie": "atend_mes"}`: linha ao longo do tempo;
-  - `{"tipo": "barras", "serie": "faltas_ubs", "realce": "UBS Centro"}`: barras a partir de uma série por categoria (unidade, especialidade). `realce` é a categoria em laranja; sem ele, a maior. De 2 a 12 categorias;
-  - `{"tipo": "barras", "itens": ["desp_ab_liq", "desp_hosp_liq"], "realce": "desp_ab_liq"}`: barras comparando itens da mesma unidade, de 2 a 8. A barra em laranja é a do `realce`; sem ele, a do `destaque` do insight, se estiver entre as barras; senão, a maior.
+- **Campos de referência.** `destaque`, `evidencias` e os ids dentro de `grafico` apontam para ids de `itens`. `grafico.serie` aponta para um id de `series`.
+- **Gráfico** é opcional. Os tipos e as regras estão em [Gráficos](#gráficos), abaixo.
 - **`ficticio`** (raiz, opcional): `true` põe a marca d'água "DADOS FICTÍCIOS · TESTE". Só para testes e demonstrações.
 - **`tipo`** é um destes: `alerta`, `oportunidade`, `tendencia`, `comparacao`, `eficiencia`, `risco`.
 - **`confianca`** é `alta`, `media` ou `baixa`. Use `baixa` quando o cruzamento depender de um arquivo do gestor sem data clara ou de uma amostra pequena.
 - **Sem dado pessoal.** Nenhum campo de texto traz nome de paciente ou de servidor, CPF, CNS, endereço ou telefone. Em `para`, vão cargo e órgão, nunca o nome da pessoa.
+
+### Gráficos
+
+Qual tipo usar para cada mensagem está em [visualizacao.md](visualizacao.md). Em todos os tipos, três campos são opcionais:
+- `titulo`: a conclusão do gráfico, até 80 caracteres e sem número digitado;
+- `rotulos`: nomes curtos por id, até 30 caracteres cada;
+- `realce`: o elemento em laranja; o resto fica cinza.
+
+| Tipo | Campos | Regras |
+|---|---|---|
+| `linha` ou `serie` | `serie`; `referencia` opcional (id de item) | a referência vira linha tracejada e tem a unidade da série |
+| `barras` por série | `serie`; `realce` é a categoria | de 2 a 12 categorias |
+| `barras` por itens | `itens` | de 2 a 8 itens, mesma unidade |
+| `composicao` | `itens` (as partes) | de 2 a 6 partes, mesma unidade, sem negativo; em %, somam 100 |
+| `cascata` | `inicio`, `passos` [{`id`, `sinal`: `+` ou `-`}], `fim` | de 1 a 4 passos, valores positivos, mesma unidade; início e passos fecham no fim |
+| `referencia` | `item`, `marcos` (de 1 a 3 ids: mínimo, limite, meta) | mesma unidade |
+| `proporcao` | `item` | item em %, entre 0 e 100 |
+
+Exemplos:
+
+```json
+{"tipo": "linha", "serie": "atend_mes", "titulo": "Sem pico de demanda: a perda de agenda é constante"}
+{"tipo": "barras", "serie": "faltas_ubs", "realce": "UBS Centro"}
+{"tipo": "cascata", "inicio": "aps_repasse_integral", "passos": [{"id": "aps_desconto_mes", "sinal": "-"}],
+ "fim": "aps_repasse_mes", "realce": "aps_desconto_mes", "rotulos": {"aps_repasse_integral": "Valor integral"}}
+{"tipo": "referencia", "item": "pessoal_rcl_pct", "marcos": ["pessoal_limite_prudencial", "pessoal_limite_maximo"]}
+```
+
+Sem `realce`, o laranja vai para o `destaque` do insight, se ele estiver no gráfico, ou para o maior valor. Na lista compacta (prioridade 4 em diante), só entram `composicao`, `referencia` e `proporcao`, em miniatura.
 
 ### Tamanhos (para caber no layout)
 

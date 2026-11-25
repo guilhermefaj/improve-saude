@@ -22,7 +22,7 @@ try:  # Windows usa cp1252 no console; sem isso os acentos quebram
 except Exception:
     pass
 
-VERSAO = "0.5.0"  # versão do plugin; aparece na nota final do PDF
+VERSAO = "0.6.0"  # versão do plugin; aparece na nota final do PDF
 USER_AGENT = f"improve-saude/{VERSAO} (+https://improve.business)"
 VERSAO_EVIDENCIAS = 1
 MINIMO_ESTAVEL = 20  # abaixo disso, uma taxa muda muito com um caso a mais ou a menos

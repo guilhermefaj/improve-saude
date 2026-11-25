@@ -6,7 +6,7 @@
     "cargo": "Coordenação de Atenção Básica",
     "orgao": "Secretaria Municipal de Saúde"
   },
-  "mensagem_principal": "Uma em cada oito consultas agendadas nas UBS terminou em falta ({{faltas_pct}}). Reduzir esse número libera agenda sem contratar ninguém, numa cidade em que {{sus_exclusivo_pct}} dos moradores dependem só do SUS.",
+  "mensagem_principal": "Uma em cada oito consultas agendadas nas UBS terminou em falta ({{faltas_pct}}). Recuperar essa agenda rende mais do que contratar, numa rede em que a atenção básica recebe só {{ab_part_pct}} do gasto em saúde.",
   "contexto": {
     "dor": "Fila crescente para especialidades e UBS sempre cheias, mas com muitos pacientes que não comparecem.",
     "material_recebido": [
@@ -14,9 +14,9 @@
       "Planilha da fila de especialidades"
     ],
     "fontes_cruzadas": [
-      "IBGE: população, Censo e PIB",
-      "Tesouro (Siconfi): gasto por área e origem do recurso",
-      "Ministério da Saúde: atenção primária, leitos e água",
+      "IBGE: população estimada",
+      "Tesouro (Siconfi): gasto por área e mínimo em saúde",
+      "Ministério da Saúde: repasse e equipes da atenção primária",
       "ANS: planos de saúde"
     ]
   },
@@ -26,7 +26,7 @@
       "tipo": "alerta",
       "titulo": "Uma em cada oito consultas agendadas vira falta",
       "destaque": "faltas_pct",
-      "achado": "De janeiro a outubro, as cinco UBS da planilha registraram {{faltas_ubs_total}} faltas para {{atend_mes_total}} atendimentos médicos. A UBS Centro concentra o maior volume. As {{equipes_esf_relato}} equipes informadas na conversa batem com o Relatório Público da APS, e dão cerca de {{faltas_por_equipe}} faltas por equipe no período.",
+      "achado": "De janeiro a outubro, as cinco UBS da planilha registraram {{faltas_ubs_total}} faltas para {{atend_mes_total}} atendimentos médicos. As {{equipes_esf_relato}} equipes informadas na conversa batem com o Relatório Público da APS, e dão cerca de {{faltas_por_equipe}} faltas por equipe no período.",
       "cruzamento": "Faltas e atendimentos do arquivo enviado, cruzados com as equipes de Saúde da Família do Ministério da Saúde.",
       "implicacao": "Cada falta é um horário que poderia ter atendido alguém da fila. Antes de pedir mais profissionais, vale recuperar essa agenda: o ganho aparece rápido e não depende de orçamento novo.",
       "acoes": [
@@ -37,7 +37,8 @@
       "grafico": {
         "tipo": "barras",
         "serie": "faltas_ubs",
-        "realce": "UBS Centro"
+        "realce": "UBS Centro",
+        "titulo": "A UBS Centro lidera, mas todas as UBS perdem agenda"
       },
       "evidencias": [
         "faltas_ubs_total",
@@ -50,80 +51,109 @@
     },
     {
       "prioridade": 2,
-      "tipo": "eficiencia",
-      "titulo": "A atenção básica fica com uma fatia pequena do gasto",
-      "destaque": "ab_part_pct",
-      "achado": "Em 2025, o município liquidou {{desp_saude_liq}} em saúde. A atenção básica recebeu {{desp_ab_liq}}, contra {{desp_hosp_liq}} da assistência hospitalar e ambulatorial e {{desp_adm_liq}} da administração.",
-      "cruzamento": "Despesas por área do Tesouro Nacional (Siconfi), sem relação com os arquivos enviados.",
-      "implicacao": "Com pouco recurso na porta de entrada, a fila de especialidades tende a crescer. O dado ajuda a defender investimento em atenção básica no conselho de saúde.",
-      "acoes": [
-        "Levar a comparação por área para a próxima reunião do conselho municipal de saúde"
-      ],
-      "grafico": {
-        "tipo": "barras",
-        "itens": [
-          "desp_hosp_liq",
-          "desp_adm_liq",
-          "desp_ab_liq",
-          "desp_vigepi_liq",
-          "desp_vigsan_liq",
-          "desp_farm_liq"
-        ]
-      },
-      "confianca": "alta",
-      "limites": "Parte do gasto da atenção básica pode estar lançada em administração."
-    },
-    {
-      "prioridade": 3,
       "tipo": "risco",
       "titulo": "O repasse federal da atenção primária chega com desconto",
       "destaque": "aps_desconto_pct",
-      "achado": "Na parcela de outubro, o Ministério da Saúde descontou {{aps_desconto_mes}} do repasse da atenção primária. A cobertura da atenção primária está em {{aps_cobertura_pct}}, mas a de saúde bucal fica em {{sb_cobertura_pct}}.",
+      "achado": "Na parcela de outubro, o Ministério da Saúde descontou {{aps_desconto_mes}} do repasse da atenção primária. A cobertura da atenção primária está em {{aps_cobertura_pct}}.",
       "cruzamento": "Relatório Público da APS, com a origem do dinheiro da saúde na matriz contábil do Tesouro.",
       "implicacao": "A União financia {{fin_uniao_pct}} da despesa em saúde. Recuperar o desconto devolve recurso já previsto, sem pedir verba nova.",
       "acoes": [
         "Conferir no e-Gestor o motivo do desconto da parcela de outubro"
       ],
       "grafico": {
-        "tipo": "barras",
-        "itens": [
-          "aps_cobertura_pct",
-          "acs_cobertura_pct",
-          "sb_cobertura_pct"
-        ]
+        "tipo": "cascata",
+        "inicio": "aps_repasse_integral",
+        "passos": [
+          {
+            "id": "aps_desconto_mes",
+            "sinal": "-"
+          }
+        ],
+        "fim": "aps_repasse_mes",
+        "realce": "aps_desconto_mes",
+        "titulo": "Do valor integral ao que chegou em outubro",
+        "rotulos": {
+          "aps_repasse_integral": "Valor integral",
+          "aps_desconto_mes": "Desconto",
+          "aps_repasse_mes": "Recebido"
+        }
       },
       "confianca": "alta",
       "limites": "A API não informa o motivo do desconto."
     },
     {
-      "prioridade": 4,
-      "tipo": "comparacao",
-      "titulo": "Mais da metade dos moradores depende só do SUS",
-      "destaque": "pop_sus_exclusivo",
-      "achado": "A ANS registra {{ans_benef}} beneficiários de planos médicos, {{ans_cobertura_pct}} da população. Os demais disputam a agenda das UBS: só o preventivo tem {{pop_mulheres_25a64}} mulheres no público-alvo.",
-      "cruzamento": "Beneficiários da ANS com a população do IBGE e do Ministério da Saúde.",
-      "implicacao": "É esse público que disputa a agenda das UBS.",
+      "prioridade": 3,
+      "tipo": "tendencia",
+      "titulo": "A procura pelas UBS ficou estável ao longo do ano",
+      "destaque": "atend_por_hab",
+      "achado": "Os atendimentos médicos variaram pouco de um mês para o outro, com o maior volume em julho. No ano, são {{atend_por_hab}} atendimentos por mil habitantes.",
+      "cruzamento": "Atendimentos do arquivo enviado divididos pela população estimada do IBGE.",
+      "implicacao": "Sem pico sazonal forte, as faltas não vêm de excesso de demanda num mês específico. São uma perda constante de agenda.",
+      "grafico": {
+        "tipo": "linha",
+        "serie": "atend_mes",
+        "titulo": "Sem pico de demanda: a perda de agenda é constante"
+      },
+      "evidencias": [
+        "pop"
+      ],
       "confianca": "media"
     },
     {
+      "prioridade": 4,
+      "tipo": "eficiencia",
+      "titulo": "A atenção básica fica com uma fatia pequena do gasto",
+      "destaque": "ab_part_pct",
+      "achado": "Em 2025, a atenção básica recebeu {{desp_ab_liq}} dos {{desp_saude_liq}} liquidados em saúde.",
+      "cruzamento": "Despesa por área do Tesouro Nacional (Siconfi).",
+      "implicacao": "Com pouco recurso na porta de entrada, a fila de especialidades tende a crescer.",
+      "grafico": {
+        "tipo": "proporcao",
+        "item": "ab_part_pct"
+      },
+      "confianca": "alta"
+    },
+    {
       "prioridade": 5,
-      "tipo": "comparacao",
-      "titulo": "Quase todo leito SUS está em hospital filantrópico",
-      "destaque": "leitos_sus_filantropicos_pct",
-      "achado": "Dos {{leitos_sus}} leitos disponíveis ao SUS, {{leitos_sus_filantropicos}} ficam em hospitais sem fins lucrativos. São {{leitos_sus_mil_hab}} leitos SUS por mil habitantes, que como polo regional também recebem os vizinhos.",
-      "cruzamento": "Leitos do CNES com a população do IBGE.",
-      "implicacao": "Como polo regional, esses leitos também recebem moradores dos municípios vizinhos.",
+      "tipo": "oportunidade",
+      "titulo": "O município já aplica acima do mínimo em saúde",
+      "destaque": "asps_pct",
+      "achado": "A receita própria aplicada em saúde superou o mínimo de {{asps_minimo}}: o esforço existe, falta priorizar.",
+      "cruzamento": "Relatório bimestral do Tesouro (Siconfi).",
+      "implicacao": "O argumento para a atenção básica é de prioridade, não de verba nova.",
+      "grafico": {
+        "tipo": "referencia",
+        "item": "asps_pct",
+        "marcos": [
+          "asps_minimo"
+        ],
+        "rotulos": {
+          "asps_minimo": "Mínimo constitucional"
+        }
+      },
       "confianca": "alta"
     },
     {
       "prioridade": 6,
-      "tipo": "alerta",
-      "titulo": "Coliformes apareceram em parte das análises da água",
-      "destaque": "agua_coliformes_pct",
-      "achado": "Em 2025, {{agua_coliformes_presente}} das {{agua_coliformes_analises}} análises de coliformes totais da vigilância deram positivo; para E. coli, que indica esgoto, foi {{agua_ecoli_presente}}.",
-      "cruzamento": "Análises de vigilância do Sisagua.",
-      "implicacao": "Coliformes totais sozinhos não indicam esgoto; a E. coli indica.",
-      "confianca": "alta"
+      "tipo": "comparacao",
+      "titulo": "Mais da metade dos moradores depende só do SUS",
+      "destaque": "pop_sus_exclusivo",
+      "achado": "A ANS registra {{ans_benef}} beneficiários de planos médicos; os demais disputam a agenda das UBS.",
+      "cruzamento": "Beneficiários da ANS com a população do IBGE e do Ministério da Saúde.",
+      "implicacao": "É esse público que disputa a agenda das UBS.",
+      "grafico": {
+        "tipo": "composicao",
+        "itens": [
+          "sus_exclusivo_pct",
+          "ans_cobertura_pct"
+        ],
+        "realce": "sus_exclusivo_pct",
+        "rotulos": {
+          "sus_exclusivo_pct": "Só SUS",
+          "ans_cobertura_pct": "Com plano de saúde"
+        }
+      },
+      "confianca": "media"
     }
   ],
   "hipoteses": [

@@ -27,7 +27,7 @@ LOGO = os.path.join(AQUI, "..", "assets", "logo-improve.png")
 
 # Marca Improve (skill improve-design, perfil publicações)
 C = {"laranja": "#F2703E", "roxo": "#483C8F", "texto": "#252527", "apoio": "#4F4F51",
-     "sup": "#F5F2F0", "supL": "#FFF7F3", "linha": "#D9D4D0", "verde": "#2E7D5B", "vermelho": "#C0392B"}
+     "sup": "#F5F2F0", "supL": "#FFF7F3", "linha": "#D9D4D0", "contexto": "#CFC8C2", "verde": "#2E7D5B", "vermelho": "#C0392B"}
 TIPO = {"alerta": ("Alerta", C["vermelho"]), "risco": ("Risco", C["vermelho"]), "oportunidade": ("Oportunidade", C["verde"]),
         "tendencia": ("Tendência", C["roxo"]), "comparacao": ("Comparação", C["roxo"]), "eficiencia": ("Eficiência", C["laranja"])}
 CONFIANCA = {"alta": "Confiança alta", "media": "Confiança média", "baixa": "Confiança baixa"}
@@ -139,14 +139,14 @@ def _periodo_curto(p):
     return str(p)
 
 
-def grafico_serie(s, w=640, h=230):
+def grafico_serie(s, w=640, h=230, ref=None, rot_ref=None):
     pts = [p for p in s["pontos"] if isinstance(p["valor"], (int, float))]
     if len(pts) < 2:
         return ""
     l, r, t, b = 52, 18, 26, 30
     vals = [p["valor"] for p in pts]
     lo = min(0, min(vals))
-    ticks = _ticks(max(vals))
+    ticks = _ticks(max(vals + ([ref["valor"]] if ref else [])))
     hi = ticks[-1] or 1
     x = lambda i: l + i * (w - l - r) / (len(pts) - 1)
     y = lambda v: t + (1 - (v - lo) / (hi - lo)) * (h - t - b)
@@ -170,6 +170,9 @@ def grafico_serie(s, w=640, h=230):
         p = pts[i]
         marcas += (f'<circle cx="{x(i):.1f}" cy="{y(p["valor"]):.1f}" r="4.5" fill="{C["laranja"]}" stroke="#fff" stroke-width="1.5"/>'
                    f'<text x="{min(max(x(i), l + 20), w - r - 20):.1f}" y="{y(p["valor"]) - 10:.1f}" text-anchor="middle" class="rot">{esc(p["fmt"])}</text>')
+    if ref:  # referência (meta, média, limite): linha tracejada com rótulo direto
+        marcas += (f'<line x1="{l}" x2="{w - r}" y1="{y(ref["valor"]):.1f}" y2="{y(ref["valor"]):.1f}" stroke="{C["roxo"]}" stroke-width="1.4" stroke-dasharray="5 3"/>'
+                   f'<text x="{w - r}" y="{y(ref["valor"]) - 5:.1f}" text-anchor="end" class="bar-rot">{esc(rot_ref)} {esc(ref["fmt"])}</text>')
     return (f'<svg viewBox="0 0 {w} {h}" class="graf" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="{esc(s["rotulo"])}">'
             f'{grade}<polygon points="{area}" fill="{C["laranja"]}" fill-opacity="0.10"/>'
             f'<polyline points="{linha}" fill="none" stroke="{C["laranja"]}" stroke-width="2.5" stroke-linejoin="round"/>'
@@ -185,12 +188,12 @@ def _sem_prefixo(rotulos):
     return [" ".join(p[n:]) for p in partes], " ".join(partes[0][:n])
 
 
-def grafico_barras(ids, itens, destaque=None, dados=None, compacto=False):
+def grafico_barras(ids, itens, destaque=None, dados=None, compacto=False, rotulos=None):
     """Barras horizontais. `dados` = [(chave, {rotulo, valor, fmt})]; sem ele, usa os itens."""
     dados = dados or [(i, itens[i]) for i in ids]
     dados = sorted(dados, key=lambda kv: -kv[1]["valor"])
     curtos, prefixo = _sem_prefixo([v["rotulo"] for _, v in dados])
-    dados = [(k, dict(v, rotulo=cur[:1].upper() + cur[1:])) for (k, v), cur in zip(dados, curtos)]
+    dados = [(k, dict(v, rotulo=((rotulos or {}).get(k) or cur)[:1].upper() + ((rotulos or {}).get(k) or cur)[1:])) for (k, v), cur in zip(dados, curtos)]
     altura_barra, gap = (16, 7) if compacto else (22, 12)
     w, l, corte = (460, 175, 27) if compacto else (640, 230, 36)
     r = 16 + 7.4 * max(len(v["fmt"]) for _, v in dados)  # espaço para o valor depois da maior barra
@@ -202,8 +205,8 @@ def grafico_barras(ids, itens, destaque=None, dados=None, compacto=False):
     linhas, yy = "", 4
     for (i, v), rot, alt in zip(dados, rotulos, alturas):
         larg = max(2, (w - l - r) * v["valor"] / hi)
-        cor = C["laranja"] if i == destaque else C["roxo"]
-        op = "1" if i == destaque else "0.35"
+        cor = C["laranja"] if i == destaque else C["contexto"]  # cor só no que importa; o resto é contexto
+        op = "1"
         meio = yy + alt / 2
         y0 = meio - (len(rot) - 1) * passo_linha / 2 + 4
         tspans = "".join(f'<tspan x="{l - 10}" y="{y0 + k * passo_linha:.1f}">{esc(t)}</tspan>' for k, t in enumerate(rot))
@@ -228,39 +231,236 @@ def _quebrar(rotulo, corte):
     return [l1] + ([resto if len(resto) <= corte else resto[:corte - 1].rstrip() + "…"] if resto else [])
 
 
-def grafico(g, ev, destaque, compacto=False):
-    """SVG do gráfico + legenda curta dizendo o que está sendo medido."""
+def ids_grafico(g):
+    """Ids de `itens` que um gráfico usa, em qualquer tipo."""
+    if not g:
+        return []
+    ids = list(g.get("itens") or [])
+    ids += [g[k] for k in ("item", "inicio", "fim", "referencia") if g.get(k)]
+    ids += [p["id"] if isinstance(p, dict) else p for p in g.get("passos") or []]
+    ids += list(g.get("marcos") or [])
+    return ids
+
+
+def _curtos(ids, itens):
+    """Rótulos sem as palavras que se repetem no começo e no fim de todos ("Limite prudencial da LRF para pessoal" -> "Prudencial")."""
+    if len(ids) < 2:
+        return {}
+    inicio, _ = _sem_prefixo([itens[i]["rotulo"] for i in ids])
+    fim, _ = _sem_prefixo([" ".join(reversed(r.split())) for r in inicio])
+    return {i: " ".join(reversed(r.split())) for i, r in zip(ids, fim) if r.strip()}
+
+
+def _rot(g, i, itens, curtos=None):
+    """Rótulo de um item no gráfico: o curto pedido em `rotulos`, senão o da evidência."""
+    r = (g.get("rotulos") or {}).get(i) or (curtos or {}).get(i) or itens[i]["rotulo"]
+    return r[:1].upper() + r[1:]
+
+
+def _larg_txt(s, px=11.5, negrito=False):
+    """Largura aproximada de um texto em Inter (o SVG não mede antes de desenhar)."""
+    return len(str(s)) * px * (0.6 if negrito else 0.56)
+
+
+def grafico_composicao(g, itens, realce, compacto=False, mini=False):
+    """Uma barra 100% com as partes de um todo, rótulo direto embaixo de cada parte."""
+    ids = g["itens"]
+    vals = [max(0, itens[i]["valor"]) for i in ids]
+    total = sum(vals) or 1
+    curtos = _curtos(ids, itens)
+    w = 520 if mini else (460 if compacto else 640)
+    l, r, alt, y0 = 2, 2, 18 if mini else (30 if compacto else 34), 4
+    util = w - l - r
+    cinzas = ["#B9B1AA", "#D6D0CA", "#C7C0BA", "#E3DED9"]
+    segs, x, k = [], l, 0
+    for i, v in zip(ids, vals):
+        lw = util * v / total
+        cor = C["laranja"] if i == realce else cinzas[k % len(cinzas)]
+        k += i != realce
+        segs.append((i, x, lw, cor))
+        x += lw
+    corpo = "".join(f'<rect x="{x0:.1f}" y="{y0}" width="{max(lw - 2, 1):.1f}" height="{alt}" fill="{cor}"/>' for _, x0, lw, cor in segs)
+    # rótulos: valor em negrito e nome embaixo; se encostar no anterior, desce uma linha com fio-guia
+    rot, ocupado, base = "", [], y0 + alt + 16
+    nivel_max, linhas_max = 0, 1
+    for n, (i, x0, lw, _) in enumerate(segs):
+        nome = [_rot(g, i, itens, curtos)] if mini else _quebrar(_rot(g, i, itens, curtos), 22)
+        fmt = itens[i]["fmt"]
+        larg = (_larg_txt(fmt, 12, True) + _larg_txt(" " + nome[0])) if mini else max(_larg_txt(fmt, 12, True), max(_larg_txt(t) for t in nome))
+        cx = x0 + lw / 2
+        ini = min(max(cx - larg / 2, l), w - r - larg)
+        nivel = 0
+        while any(not (ini + larg + 8 < a or ini > b + 8) for a, b, nv in ocupado if nv == nivel):
+            nivel += 1
+        ocupado.append((ini, ini + larg, nivel))
+        nivel_max = max(nivel_max, nivel)
+        linhas_max = max(linhas_max, len(nome))
+        yb = base + nivel * (18 if mini else 14 + 13 * 2 + 6)
+        if nivel:
+            rot += f'<line x1="{cx:.1f}" x2="{cx:.1f}" y1="{y0 + alt + 2}" y2="{yb - 12}" stroke="{C["apoio"]}" stroke-width="0.7"/>'
+        meio = ini + larg / 2
+        if mini:  # uma linha só: valor em negrito e o nome ao lado
+            rot += (f'<text x="{meio:.1f}" y="{yb}" text-anchor="middle"><tspan class="rot">{esc(fmt)}</tspan>'
+                    f'<tspan class="bar-rot"> {esc(nome[0])}</tspan></text>')
+            continue
+        rot += f'<text x="{meio:.1f}" y="{yb}" text-anchor="middle" class="rot">{esc(fmt)}</text>'
+        rot += "".join(f'<text x="{meio:.1f}" y="{yb + 15 + 13 * j}" text-anchor="middle" class="bar-rot">{esc(t)}</text>'
+                       for j, t in enumerate(nome))
+    h = base + nivel_max * (18 if mini else 14 + 13 * 2 + 6) + (6 if mini else 13 * linhas_max + 6)
+    return f'<svg viewBox="0 0 {w} {h:.0f}" class="graf" xmlns="http://www.w3.org/2000/svg">{corpo}{rot}</svg>'
+
+
+def grafico_cascata(g, itens, realce, compacto=False):
+    """Do valor inicial ao final, passo a passo (cascata). Barras partem do zero."""
+    passos = [(p["id"], -1 if p.get("sinal", "-") == "-" else 1) if isinstance(p, dict) else (p, -1) for p in g["passos"]]
+    colunas = [(g["inicio"], 0, itens[g["inicio"]]["valor"], "total")]
+    nivel = itens[g["inicio"]]["valor"]
+    niveis = [nivel]  # onde a conta está depois de cada coluna
+    for i, s in passos:
+        v = itens[i]["valor"]
+        novo = nivel + s * v
+        colunas.append((i, min(nivel, novo), max(nivel, novo), "passo"))
+        nivel = novo
+        niveis.append(nivel)
+    colunas.append((g["fim"], 0, itens[g["fim"]]["valor"], "total"))
+    w, h = (460, 175) if compacto else (640, 230)
+    t, b, l, r = 24, 44, 8, 8
+    hi = max(c_[2] for c_ in colunas) or 1
+    y = lambda v: t + (1 - v / hi) * (h - t - b)
+    n = len(colunas)
+    slot = (w - l - r) / n
+    bw = min(slot * 0.62, 90)
+    out = f'<line x1="{l}" x2="{w - r}" y1="{y(0):.1f}" y2="{y(0):.1f}" stroke="{C["linha"]}" stroke-width="1"/>'
+    for k, (i, lo, hi_, tipo) in enumerate(colunas):
+        x0 = l + k * slot + (slot - bw) / 2
+        cor = C["laranja"] if i == realce else ("#B9B1AA" if tipo == "total" else "#D6D0CA")
+        out += f'<rect x="{x0:.1f}" y="{y(hi_):.1f}" width="{bw:.1f}" height="{max(y(lo) - y(hi_), 1.5):.1f}" fill="{cor}" rx="2"/>'
+        out += f'<text x="{x0 + bw / 2:.1f}" y="{y(hi_) - 7:.1f}" text-anchor="middle" class="rot">{esc(itens[i]["fmt"])}</text>'
+        for j, tx in enumerate(_quebrar(_rot(g, i, itens), 16 if compacto else 20)):
+            out += f'<text x="{x0 + bw / 2:.1f}" y="{h - b + 16 + 13 * j:.1f}" text-anchor="middle" class="bar-rot">{esc(tx)}</text>'
+        if k < n - 1:  # fio que liga o topo de uma coluna à seguinte
+            yy = y(niveis[k])
+            out += (f'<line x1="{x0 + bw:.1f}" x2="{l + (k + 1) * slot + (slot - bw) / 2:.1f}" y1="{yy:.1f}" y2="{yy:.1f}" '
+                    f'stroke="{C["apoio"]}" stroke-width="0.7" stroke-dasharray="3 2"/>')
+    return f'<svg viewBox="0 0 {w} {h}" class="graf" xmlns="http://www.w3.org/2000/svg">{out}</svg>'
+
+
+def grafico_referencia(g, itens, compacto=False, mini=False):
+    """Um valor contra marcos de referência (mínimo, limite, meta): barra e linhas verticais rotuladas."""
+    i, marcos = g["item"], list(g.get("marcos") or [])
+    un = itens[i]["unidade"]
+    vals = [itens[i]["valor"]] + [itens[m]["valor"] for m in marcos]
+    hi = max(vals) * 1.12
+    if un == "%" and hi > 80:
+        hi = 100
+    w = 520 if mini else (460 if compacto else 640)
+    l, r = 4, 70
+    x = lambda v: l + (w - l - r) * v / hi
+    curtos = _curtos(marcos, itens)
+    # cada rótulo fica ao lado da sua linha: assim nenhuma linha cruza o texto de outro marco
+    topo, ocup, nv_max = [], [], 0
+    ordem = sorted(marcos, key=lambda m: itens[m]["valor"])
+    for k, m in enumerate(ordem):
+        txt = f'{_rot(g, m, itens, curtos)} {itens[m]["fmt"]}'
+        larg = _larg_txt(txt, 11)
+        cx = x(itens[m]["valor"])
+        lado = "esq" if k < len(ordem) / 2 else "dir"
+        ini = cx - 5 - larg if lado == "esq" else cx + 5
+        if ini < l:
+            ini, lado = cx + 5, "dir"
+        if ini + larg > w - 2:
+            ini, lado = cx - 5 - larg, "esq"
+        nv = 0
+        while any(not (ini + larg + 6 < a_ or ini > b_ + 6) for a_, b_, n in ocup if n == nv):
+            nv += 1
+        ocup.append((ini, ini + larg, nv))
+        nv_max = max(nv_max, nv)
+        topo.append((m, ini, nv, txt))
+    alt = 22 if mini else 28
+    y0 = 18 + (nv_max + 1) * 15
+    out = f'<rect x="{l}" y="{y0}" width="{w - l - r}" height="{alt}" fill="{C["sup"]}" rx="3"/>'
+    out += f'<rect x="{l}" y="{y0 + alt * 0.2:.1f}" width="{max(x(itens[i]["valor"]) - l, 2):.1f}" height="{alt * 0.6:.1f}" fill="{C["laranja"]}" rx="2"/>'
+    out += f'<text x="{x(itens[i]["valor"]) + 7:.1f}" y="{y0 + alt / 2 + 4:.1f}" class="rot">{esc(itens[i]["fmt"])}</text>'
+    for m, ini, nv, txt in topo:
+        cx = x(itens[m]["valor"])
+        yt = 14 + nv * 15
+        out += (f'<line x1="{cx:.1f}" x2="{cx:.1f}" y1="{yt - 9}" y2="{y0 + alt + 3}" stroke="{C["roxo"]}" stroke-width="1.6"/>'
+                f'<text x="{ini:.1f}" y="{yt}" class="bar-rot">{esc(txt)}</text>')
+    h = y0 + alt + 8
+    return f'<svg viewBox="0 0 {w} {h:.0f}" class="graf" xmlns="http://www.w3.org/2000/svg">{out}</svg>'
+
+
+def grafico_proporcao(g, itens, compacto=False, mini=False):
+    """Um percentual sobre o todo: barra cheia em cinza, a parte em laranja e o valor ao lado."""
+    i = g["item"]
+    v = max(0, min(100, itens[i]["valor"]))
+    sem_valor = mini and g.get("_destaque") == i  # o número já está no título da linha: não repete
+    w = 520 if mini else (460 if compacto else 640)
+    l, r, alt = 2, (4 if sem_valor else 70), 14 if mini else 22
+    larg = (w - l - r) * v / 100
+    out = (f'<rect x="{l}" y="4" width="{w - l - r}" height="{alt}" fill="#E3DED9" rx="3"/>'
+           f'<rect x="{l}" y="4" width="{max(larg, 2):.1f}" height="{alt}" fill="{C["laranja"]}" rx="3"/>'
+           + ("" if sem_valor else f'<text x="{w - r + 8}" y="{4 + alt / 2 + 4:.1f}" class="rot">{esc(itens[i]["fmt"])}</text>'))
+    return f'<svg viewBox="0 0 {w} {alt + 8}" class="graf" xmlns="http://www.w3.org/2000/svg">{out}</svg>'
+
+
+def _legenda(g, ev, ids):
+    """Linha pequena sob o título do gráfico: o que é medido e o período."""
+    it = ev["itens"]
+    periodos = sorted({periodo(it[i].get("periodo")) for i in ids if it[i].get("periodo")})
+    _, prefixo = _sem_prefixo([it[i]["rotulo"] for i in ids]) if len(ids) > 1 else ("", it[ids[0]]["rotulo"])
+    prefixo = re.sub(r"\s+(em|de|da|do|das|dos|por|na|no|nas|nos|com)$", "", prefixo or "", flags=re.I)
+    padrao = {"composicao": "Partes do total", "cascata": "Do valor inicial ao final", "referencia": "Valor e referências"}
+    return (prefixo or padrao.get(g.get("tipo"), "Comparação")) + (" · " + " e ".join(periodos) if periodos else "")
+
+
+def grafico(g, ev, destaque, compacto=False, mini=False):
+    """SVG do gráfico, com o título que diz a conclusão (se houver) e a legenda do que é medido."""
     if not g:
         return ""
-    if g.get("tipo") == "serie":
+    tipo = g.get("tipo")
+    it = ev["itens"]
+    ids = ids_grafico(g)
+    realce = g.get("realce") if g.get("realce") in ids else (destaque if destaque in ids else None)
+    if tipo in ("serie", "linha"):
         s = ev["series"][g["serie"]]
-        svg, leg = grafico_serie(s, *((420, 190) if compacto else (640, 230))), s["rotulo"]
-    elif g.get("serie"):  # barras a partir de uma série por categoria (ex.: faltas por UBS)
+        ref = it.get(g.get("referencia")) if g.get("referencia") else None
+        svg, leg = grafico_serie(s, *((420, 190) if compacto else (640, 230)), ref=ref, rot_ref=_rot(g, g["referencia"], it) if ref else None), s["rotulo"]
+    elif tipo == "barras" and g.get("serie"):  # barras a partir de uma série por categoria (ex.: faltas por UBS)
         s = ev["series"][g["serie"]]
         dados = [(p["periodo"], {"rotulo": p["periodo"], "valor": p["valor"], "fmt": p["fmt"]})
                  for p in s["pontos"] if isinstance(p["valor"], (int, float))]
         realce = g.get("realce") or max(dados, key=lambda kv: kv[1]["valor"])[0]
         svg, _ = grafico_barras([], {}, realce, dados=dados, compacto=compacto)
         leg = s["rotulo"]
-    else:
+    elif tipo == "barras":
         # laranja: o `realce` pedido; senão o número em destaque, se for uma das barras; senão a maior
-        realce = g.get("realce") if g.get("realce") in g["itens"] else destaque
-        if realce not in g["itens"]:
-            realce = max(g["itens"], key=lambda i: ev["itens"][i]["valor"])
-        svg, prefixo = grafico_barras(g["itens"], ev["itens"], realce, compacto=compacto)
-        periodos = sorted({periodo(ev["itens"][i].get("periodo")) for i in g["itens"] if ev["itens"][i].get("periodo")})
-        prefixo = re.sub(r"\s+(em|de|da|do|das|dos|por|na|no|nas|nos)$", "", prefixo or "", flags=re.I)
-        leg = (prefixo or "Comparação") + (" · " + " e ".join(periodos) if periodos else "")
+        realce = realce or max(g["itens"], key=lambda i: it[i]["valor"])
+        svg, _ = grafico_barras(g["itens"], it, realce, compacto=compacto, rotulos=g.get("rotulos"))
+        leg = _legenda(g, ev, g["itens"])
+    elif tipo == "composicao":
+        svg, leg = grafico_composicao(g, it, realce or max(g["itens"], key=lambda i: it[i]["valor"]), compacto, mini), _legenda(g, ev, g["itens"])
+    elif tipo == "cascata":
+        svg, leg = grafico_cascata(g, it, realce, compacto), _legenda(g, ev, ids)
+    elif tipo == "referencia":
+        svg, leg = grafico_referencia(g, it, compacto, mini), _legenda(g, ev, [g["item"]])
+    elif tipo == "proporcao":
+        svg, leg = grafico_proporcao(dict(g, _destaque=destaque), it, compacto, mini), _legenda(g, ev, [g["item"]])
+    else:
+        return ""
     if not svg:
         return ""
-    return f'<div class="legenda-graf">{plano(leg[:1].upper() + leg[1:])}</div>{svg}'
+    if mini:
+        return svg
+    titulo = f'<div class="titulo-graf">{plano(g["titulo"])}</div>' if g.get("titulo") else ""
+    return f'{titulo}<div class="legenda-graf">{plano(leg[:1].upper() + leg[1:])}</div>{svg}'
 
 
 def fontes_de(ins, ev):
     vistos = []
     ids = [ins["destaque"]] + list(ins.get("evidencias") or [])
     g = ins.get("grafico") or {}
-    ids += g.get("itens") or []
+    ids += ids_grafico(g)
     if g.get("serie"):
         ids.append(g["serie"])
     for campo in ("achado", "implicacao", "cruzamento", "limites"):  # números citados no texto também têm fonte
@@ -341,6 +541,7 @@ def insight_compacto(ins, ev):
     rot, cor = TIPO[ins["tipo"]]
     return f"""<li style="border-left-color:{cor}"><span class="mini-tipo" style="color:{cor}">{rot}</span>
   <strong>{texto(ins["titulo"], it)}</strong> <span class="num">{esc(d["fmt"])}</span><br>{texto(ins["achado"], it)}
+  {grafico(ins.get("grafico"), ev, ins["destaque"], mini=True)}
   <span class="fonte-mini">Fontes: {plano(fontes_de(ins, ev))}</span></li>"""
 
 
@@ -357,7 +558,7 @@ def ids_citados(doc, ev):
         for i in ins.get("evidencias") or []:
             add(i)
         g = ins.get("grafico") or {}
-        for i in g.get("itens") or []:
+        for i in ids_grafico(g):
             add(i)
         add(g.get("serie"))
     # inclui as evidências de que os cálculos dependem
@@ -435,7 +636,7 @@ body { font-family: 'Inter', Arial, sans-serif; color: __texto__; font-size: 10.
        -webkit-print-color-adjust: exact; print-color-adjust: exact; }
 h1, h2, h3, .valor, .sec-num, .kpi { font-family: 'Clash Display', 'Inter', Arial, sans-serif; font-weight: 600; }
 /* quebras: títulos balanceados, parágrafos sem palavra sozinha no fim, sem hifenização automática */
-h1, h2, h3, h4, .manchete, .kpi-rot, .legenda-num, .sec-rot, .legenda-graf { text-wrap: balance; }
+h1, h2, h3, h4, .manchete, .kpi-rot, .legenda-num, .sec-rot, .legenda-graf, .titulo-graf { text-wrap: balance; }
 p, li, td, .mensagem, .contexto div { text-wrap: pretty; orphans: 3; widows: 3; hyphens: manual; }
 a { color: __roxo__; }
 .pagina { position: relative; }
@@ -486,6 +687,8 @@ a { color: __roxo__; }
 .hero-num .valor { font-size: 46pt; line-height: 1; color: __laranja__; white-space: nowrap; }
 .legenda-num { font-size: 10pt; font-weight: 600; } .legenda-num span { font-weight: 400; color: __apoio__; font-size: 8.5pt; }
 .graf-box { margin: 2mm 0 3mm; }
+.titulo-graf { font-size: 10pt; font-weight: 700; color: __texto__; margin-bottom: .8mm; line-height: 1.3; }
+.compactos .graf { max-width: 125mm; margin-top: 1.8mm; }
 .legenda-graf { font-size: 7.8pt; font-weight: 600; color: __apoio__; text-transform: uppercase; letter-spacing: .05em; margin-bottom: 1.5mm; }
 .achado { font-size: 11.5pt; }
 .cruz, .limites { font-size: 8.8pt; color: __apoio__; margin: 1.5mm 0; }
