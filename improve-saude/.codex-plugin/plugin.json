@@ -1,7 +1,7 @@
 {
   "name": "improve-saude",
-  "version": "0.6.0",
-  "description": "Diagnóstico de saúde pública municipal: conversa com o gestor, lê os arquivos dele sem expor dados pessoais, cruza com dados públicos (IBGE, Siconfi, SIOPS, Fundo Nacional de Saúde, atenção primária, CNES, ANS, InfoDengue) e entrega um PDF com insights práticos, com a marca Improve Business.",
+  "version": "0.6.1",
+  "description": "Diagnóstico de saúde pública municipal: conversa com o gestor, lê os arquivos dele sem expor dados pessoais, cruza com dados públicos (IBGE, Siconfi, SIOPS, Fundo Nacional de Saúde, atenção primária, CNES, ANS, Sisagua, InfoDengue) e entrega um PDF com insights práticos e o gráfico certo para cada um, com a marca Improve Business.",
   "author": {
     "name": "Improve Business",
     "email": "contato@improve.business",
@@ -15,10 +15,10 @@
   "interface": {
     "displayName": "Improve · Saúde Pública",
     "shortDescription": "Diagnóstico de saúde do município em PDF, com dados públicos.",
-    "longDescription": "Para quem trabalha na gestão da saúde de um município. Você conta o problema e envia suas planilhas; o Codex lê os arquivos sem expor dados pessoais, cruza com IBGE, Tesouro (Siconfi), SIOPS, Fundo Nacional de Saúde, Relatório Público da APS, CNES, ANS e InfoDengue e entrega um PDF curto, com o achado mais importante em destaque.",
+    "longDescription": "Para quem trabalha na gestão da saúde de um município. Você conta o problema e envia suas planilhas; o Codex lê os arquivos sem expor dados pessoais, cruza com IBGE, Tesouro (Siconfi), SIOPS, Fundo Nacional de Saúde, Relatório Público da APS, CNES, ANS, Sisagua e InfoDengue e entrega um PDF curto, com o achado mais importante em destaque e um gráfico para cada achado.",
     "developerName": "Improve Business",
     "category": "Productivity",
-    "capabilities": ["Diagnóstico em PDF", "Dados públicos do SUS", "Leitura de planilhas sem dados pessoais"],
+    "capabilities": ["Diagnóstico em PDF", "Dados públicos do SUS", "Leitura de planilhas sem dados pessoais", "Gráficos escolhidos pela mensagem"],
     "defaultPrompt": [
       "Como funciona o diagnóstico de saúde? Por onde eu começo?",
       "Tenho uma planilha de atendimentos. O que ela mostra?",

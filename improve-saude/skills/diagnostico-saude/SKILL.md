@@ -1,6 +1,6 @@
 ---
 name: diagnostico-saude
-description: Diagnóstico de saúde pública municipal com a marca Improve Business. Use quando um gestor, secretário, coordenador ou técnico de saúde de um município contar um problema do trabalho (fila, faltas, falta de médico, dengue, orçamento, cobertura, rede de UBS, metas) e quiser entender o que os dados dizem. A skill conversa, lê os arquivos que a pessoa enviar sem expor dados pessoais, cruza com dados públicos (IBGE, Tesouro/Siconfi, CNES, InfoDengue) e entrega um PDF com insights práticos em ordem de importância. Dispare também com pedidos como "me ajuda a analisar a saúde do meu município", "tenho essa planilha de atendimentos, o que ela mostra?", "preciso de um diagnóstico para levar ao prefeito", e quando alguém chamar a skill sem contexto ou perguntar como funciona o diagnóstico de saúde.
+description: Diagnóstico de saúde pública municipal com a marca Improve Business. Use quando um gestor, secretário, coordenador ou técnico de saúde de um município contar um problema do trabalho (fila, faltas, falta de médico, dengue, orçamento, cobertura, rede de UBS, metas) e quiser entender o que os dados dizem. A skill conversa, lê os arquivos que a pessoa enviar sem expor dados pessoais, cruza com dados públicos (IBGE, Tesouro/Siconfi, SIOPS, Fundo Nacional de Saúde, atenção primária, CNES, ANS, Sisagua, InfoDengue) e entrega um PDF com insights práticos em ordem de importância, cada um com o gráfico que prova o achado. Dispare também com pedidos como "me ajuda a analisar a saúde do meu município", "tenho essa planilha de atendimentos, o que ela mostra?", "preciso de um diagnóstico para levar ao prefeito", e quando alguém chamar a skill sem contexto ou perguntar como funciona o diagnóstico de saúde.
 ---
 
 # Diagnóstico de Saúde Pública
@@ -17,13 +17,15 @@ O documento é gerado automaticamente e de graça. A capa e a nota final já diz
 
 ## Onde ficam as coisas
 
-- Scripts: pasta `scripts/` desta skill. Rode sempre com `python "<pasta desta skill>/scripts/NOME.py"`, a partir de uma **pasta de trabalho** criada para a conversa (ex.: `diagnostico-pouso-alegre/`). Os arquivos `evidencias.json`, `documento.json`, `diagnostico.html` e `diagnostico.pdf` nascem nela.
+- Scripts: pasta `scripts/` desta skill. Rode sempre com `python "<pasta desta skill>/scripts/NOME.py"`, a partir de uma **pasta de trabalho** criada para a conversa (ex.: `diagnostico-pouso-alegre/`). Os arquivos `evidencias.json`, `documento.json` e o HTML e o PDF com o nome do município (`diagnostico-pouso-alegre.pdf`) nascem nela.
 - Nos comandos abaixo, `scripts/` é abreviação do caminho completo da pasta de scripts desta skill. A pasta atual é sempre a de trabalho.
 - Crie a pasta e entre nela em comandos separados, e rode um script por comando. Encadear `cd` com outro comando, usar variáveis ou juntar vários scripts numa linha faz o agente pedir aprovação de novo a cada vez. Os comandos e opções estão todos aqui: não precisa abrir o `--help` de cada script.
 - Python 3.9 ou mais novo, só com a biblioteca padrão. Não instale nada.
 - Contrato dos arquivos: [contrato.md](references/contrato.md).
 - Fontes públicas, o que cada uma entrega e suas manhas: [fontes-publicas.md](references/fontes-publicas.md).
 - Qual dor pede qual fonte e qual cruzamento: [mapa-dores.md](references/mapa-dores.md).
+- Dados pessoais, o que nunca aparece: [lgpd.md](references/lgpd.md).
+- Qual gráfico usar para cada achado: [visualizacao.md](references/visualizacao.md).
 
 ## Onde você está rodando
 
@@ -57,7 +59,7 @@ Muita gente abre a skill sem saber o que ela faz: chama pelo nome, diz "oi", ped
    - "Preciso mostrar ao prefeito para onde vai o dinheiro da saúde."
    - "Como está a dengue aqui em comparação com o começo do ano?"
 3. **O que ajuda ter à mão**, sem exigir nada: o município e a UF e, se tiver, uma planilha (atendimentos, fila, faltas, uma exportação do TabNet). Se der para tirar as colunas de nome e CPF antes, melhor; se vierem, você não as usa.
-4. **Um atalho:** "Se preferir, me diga só o município e eu começo com um retrato a partir de dados públicos (população, gasto em saúde, atenção primária, repasses federais, rede de unidades, dengue). A gente escolhe o foco a partir dele."
+4. **Um atalho:** "Se preferir, me diga só o município e eu começo com um retrato a partir de dados públicos (população, gasto em saúde e quem o financia, atenção primária, repasses federais, rede de unidades, leitos, planos de saúde, dengue). A gente escolhe o foco a partir dele."
 
 Diga em meia frase que o diagnóstico é automático e gratuito, e feche com uma pergunta só: "Qual é o município e o que mais está pegando aí?". Se o passo 0 mostrou que não há internet, troque o atalho por "me conte o problema e mande o que tiver" e não prometa dados públicos.
 
@@ -74,7 +76,7 @@ Deixe a pessoa falar. Depois, se faltar, pergunte em **uma** mensagem curta (no 
 Se ela já mandou arquivos, não pergunte o que dá para ver neles. Guarde números que ela disser ("temos 32 equipes") para registrar como relato no passo 4.
 
 - **Dor vaga** ("a saúde aqui está ruim"): não chute. Ofereça duas ou três leituras possíveis a partir do [mapa de dores](references/mapa-dores.md) ("pode ser fila, falta de médico ou orçamento; por onde começamos?") e siga pela que ela escolher.
-- **Sem arquivos:** diga logo o que dá para fazer só com dados públicos (população, gasto em saúde por área, rede de estabelecimentos, dengue) e que uma planilha dela deixaria o diagnóstico mais preciso. Não trave esperando arquivo.
+- **Sem arquivos:** diga logo o que dá para fazer só com dados públicos (população, gasto em saúde por área, atenção primária, repasses, rede de estabelecimentos, leitos, planos de saúde, dengue, água) e que uma planilha dela deixaria o diagnóstico mais preciso. Não trave esperando arquivo.
 
 ### 2. Ler os arquivos enviados
 
