@@ -395,6 +395,8 @@ def rastro(doc, ev):
             pts = [p for p in e["pontos"] if isinstance(p["valor"], (int, float))]
             lo, hi = min(pts, key=lambda p: p["valor"]), max(pts, key=lambda p: p["valor"])
             valor = f"{lo['fmt']} a {hi['fmt']}" if pts else "série vazia"
+            if e["pontos"] and not e.get("periodo"):
+                e = {**e, "periodo": f"{e['pontos'][0]['periodo']} a {e['pontos'][-1]['periodo']}"}
         origem = ORIGEM.get(e["origem"], e["origem"])
         if e.get("formula"):
             f = e["formula"]

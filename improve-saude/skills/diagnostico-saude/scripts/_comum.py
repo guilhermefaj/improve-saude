@@ -22,7 +22,7 @@ try:  # Windows usa cp1252 no console; sem isso os acentos quebram
 except Exception:
     pass
 
-VERSAO = "0.3.0"  # versão do plugin; aparece na nota final do PDF
+VERSAO = "0.4.0"  # versão do plugin; aparece na nota final do PDF
 USER_AGENT = f"improve-saude/{VERSAO} (+https://improve.business)"
 VERSAO_EVIDENCIAS = 1
 MINIMO_ESTAVEL = 20  # abaixo disso, uma taxa muda muito com um caso a mais ou a menos
@@ -50,7 +50,11 @@ def get_json(url, params=None, tentativas=3, timeout=60):
         try:
             req = urllib.request.Request(url, headers={"User-Agent": USER_AGENT, "Accept": "application/json"})
             with urllib.request.urlopen(req, timeout=timeout) as r:
-                return json.loads(r.read().decode("utf-8"))
+                corpo = r.read()
+            try:
+                return json.loads(corpo.decode("utf-8"))
+            except UnicodeDecodeError:  # alguns sistemas do governo respondem em Latin-1
+                return json.loads(corpo.decode("latin-1"))
         except urllib.error.HTTPError as e:
             ultimo = e
             if e.code in (400, 401, 403, 404):
@@ -97,10 +101,12 @@ def fmt_brl(v):
     if v is None:
         return "sem dado"
     a = abs(float(v))
-    if a >= 1e9:
-        return "R$ " + fmt_num(v / 1e9, 1) + " bilhões"
+    if a == 0:
+        return "R$ 0"
+    if a >= 1e9:  # "R$ 1,2 bilhão", mas "R$ 2,0 bilhões"
+        return "R$ " + fmt_num(v / 1e9, 1) + (" bilhão" if a < 1.95e9 else " bilhões")
     if a >= 1e6:
-        return "R$ " + fmt_num(v / 1e6, 1) + " milhões"
+        return "R$ " + fmt_num(v / 1e6, 1) + (" milhão" if a < 1.95e6 else " milhões")
     if a >= 1e4:
         return "R$ " + fmt_num(v / 1e3, 1) + " mil"
     return "R$ " + fmt_num(v, 2 if a < 100 else 0)

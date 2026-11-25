@@ -57,7 +57,7 @@ Muita gente abre a skill sem saber o que ela faz: chama pelo nome, diz "oi", ped
    - "Preciso mostrar ao prefeito para onde vai o dinheiro da saúde."
    - "Como está a dengue aqui em comparação com o começo do ano?"
 3. **O que ajuda ter à mão**, sem exigir nada: o município e a UF e, se tiver, uma planilha (atendimentos, fila, faltas, uma exportação do TabNet). Se der para tirar as colunas de nome e CPF antes, melhor; se vierem, você não as usa.
-4. **Um atalho:** "Se preferir, me diga só o município e eu começo com um retrato a partir de dados públicos (população, gasto em saúde, rede de unidades, dengue). A gente escolhe o foco a partir dele."
+4. **Um atalho:** "Se preferir, me diga só o município e eu começo com um retrato a partir de dados públicos (população, gasto em saúde, atenção primária, repasses federais, rede de unidades, dengue). A gente escolhe o foco a partir dele."
 
 Diga em meia frase que o diagnóstico é automático e gratuito, e feche com uma pergunta só: "Qual é o município e o que mais está pegando aí?". Se o passo 0 mostrou que não há internet, troque o atalho por "me conte o problema e mande o que tiver" e não prometa dados públicos.
 
@@ -106,10 +106,20 @@ Escolha as fontes pelo [mapa de dores](references/mapa-dores.md). O município v
 ```
 python scripts/fontes.py municipio --nome "Pouso Alegre" --uf MG
 python scripts/fontes.py populacao
-python scripts/fontes.py financas --ano 2025      # Siconfi: % em saúde e despesa por área
+python scripts/fontes.py financas --ano 2025      # Siconfi: % em saúde, despesa por área, pessoal/RCL, emendas
 python scripts/fontes.py cnes                     # rede: UBS, hospitais, UPA, CAPS
 python scripts/fontes.py arbovirose --ano 2026    # InfoDengue: casos, alerta, clima
+python scripts/fontes.py aps                      # cobertura da atenção primária, repasse federal e descontos
+python scripts/fontes.py siops --ano 2025         # SIOPS: gasto por habitante, pessoal, medicamentos, terceiros
+python scripts/fontes.py repasses --ano 2025      # FNS: repasses federais por bloco (MAC, APS, vigilância)
+python scripts/fontes.py contexto                 # IBGE: saneamento, envelhecimento, mortalidade infantil
 ```
+
+Rode só o que a dor pede; o [mapa de dores](references/mapa-dores.md) diz quais. Três cuidados:
+
+- O dado da APS chega com cerca de 3 meses de atraso e o período sai no resumo. A API não diz o motivo do desconto no repasse: não invente um; sugira conferir no e-Gestor ou no relatório do site.
+- SIOPS, Siconfi e FNS medem o gasto de jeitos diferentes. Não some nem compare números de fontes diferentes como se fossem a mesma conta; se divergirem, isso pode virar um alerta, com a explicação.
+- O Censo é de 2022 e o IDHM é de 2010. Diga o ano no texto quando usar.
 
 Se o município for ambíguo, o script lista os candidatos: pergunte qual é. Se uma fonte falhar, siga com as outras e registre a limitação no campo `limites` do insight. Se a falha for de rede e o ambiente permitir pedir acesso à internet (no Codex, por exemplo), peça antes de desistir. Se **nenhuma** fonte responder, siga só com arquivos e relatos, e diga isso na capa em `contexto.fontes_cruzadas` ("Sem acesso às fontes públicas nesta sessão").
 

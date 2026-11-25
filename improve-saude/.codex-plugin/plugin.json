@@ -1,7 +1,7 @@
 {
   "name": "improve-saude",
-  "version": "0.3.0",
-  "description": "Diagnóstico de saúde pública municipal: conversa com o gestor, lê os arquivos dele sem expor dados pessoais, cruza com dados públicos (IBGE, Siconfi, CNES, InfoDengue) e entrega um PDF com insights práticos, com a marca Improve Business.",
+  "version": "0.4.0",
+  "description": "Diagnóstico de saúde pública municipal: conversa com o gestor, lê os arquivos dele sem expor dados pessoais, cruza com dados públicos (IBGE, Siconfi, SIOPS, Fundo Nacional de Saúde, atenção primária, CNES, InfoDengue) e entrega um PDF com insights práticos, com a marca Improve Business.",
   "author": {
     "name": "Improve Business",
     "email": "contato@improve.business",
@@ -15,7 +15,7 @@
   "interface": {
     "displayName": "Improve · Saúde Pública",
     "shortDescription": "Diagnóstico de saúde do município em PDF, com dados públicos.",
-    "longDescription": "Para quem trabalha na gestão da saúde de um município. Você conta o problema e envia suas planilhas; o Codex lê os arquivos sem expor dados pessoais, cruza com IBGE, Tesouro (Siconfi), CNES e InfoDengue e entrega um PDF curto, com o achado mais importante em destaque.",
+    "longDescription": "Para quem trabalha na gestão da saúde de um município. Você conta o problema e envia suas planilhas; o Codex lê os arquivos sem expor dados pessoais, cruza com IBGE, Tesouro (Siconfi), SIOPS, Fundo Nacional de Saúde, Relatório Público da APS, CNES e InfoDengue e entrega um PDF curto, com o achado mais importante em destaque.",
     "developerName": "Improve Business",
     "category": "Productivity",
     "capabilities": ["Diagnóstico em PDF", "Dados públicos do SUS", "Leitura de planilhas sem dados pessoais"],

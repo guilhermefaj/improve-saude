@@ -36,7 +36,7 @@
 ```mermaid
 flowchart LR
   A["Você conta a dor<br>e envia planilhas"] --> B["Leitura só de totais,<br>sem dado pessoal"]
-  B --> C["Cruzamento com IBGE,<br>Siconfi, CNES e InfoDengue"]
+  B --> C["Cruzamento com IBGE, Tesouro<br>e Ministério da Saúde"]
   C --> D["Checagem de<br>cada número"]
   D --> E["PDF em ordem<br>de importância"]
   classDef fim fill:#F2703E,stroke:#F2703E,color:#fff
@@ -141,6 +141,7 @@ Não sabe o que pedir? Chame a skill sem dizer nada ou pergunte "como funciona?"
 |---|---|---|
 | Fila crescendo | "A fila de especialidades em Pouso Alegre (MG) não para de crescer. Segue a planilha de atendimentos." | Onde a agenda se perde, por unidade, e o que fazer primeiro |
 | Prestar contas | "Preciso mostrar ao prefeito para onde vai o dinheiro da saúde." | O gasto por área, do Tesouro (Siconfi), e o que ele indica |
+| Recurso federal | "Estamos perdendo dinheiro da atenção primária?" | Descontos no repasse da APS, classificação das equipes e cobertura |
 | Vigilância | "Como está a dengue aqui em comparação com o começo do ano?" | Casos e nível de alerta do InfoDengue ao longo das semanas |
 | Só um retrato | "Serra da Saudade, MG." | Um retrato curto com dados públicos, para você escolher o foco |
 
@@ -186,7 +187,17 @@ improve-saude/
     assets/                            logo da Improve e o exemplo fictício do autoteste
 ```
 
-**Fontes públicas:** [IBGE](https://www.ibge.gov.br) (população), [Tesouro Nacional · Siconfi](https://siconfi.tesouro.gov.br) (despesa em saúde por área), [CNES](https://cnes.datasus.gov.br) (rede de estabelecimentos) e [InfoDengue](https://info.dengue.mat.br) (casos e alerta de dengue).
+**Fontes públicas** (todas abertas, sem chave nem login):
+
+| Fonte | O que traz |
+|---|---|
+| [IBGE](https://www.ibge.gov.br) | População, Censo 2022 (saneamento, idade, alfabetização) e IBGE Cidades (mortalidade infantil, internações por diarreia, IDHM) |
+| [Tesouro Nacional · Siconfi](https://siconfi.tesouro.gov.br) | % aplicado em saúde, despesa por área, pessoal sobre a receita corrente líquida e emendas |
+| [SIOPS](https://siops.datasus.gov.br) | Gasto por habitante e peso de pessoal, terceiros e medicamentos na despesa em saúde |
+| [Fundo Nacional de Saúde](https://portalfns.saude.gov.br) | Repasses federais por bloco e descontos |
+| [Relatório Público da APS](https://relatorioaps.saude.gov.br) | Cobertura da atenção primária, saúde bucal e ACS, repasse mensal e classificação das equipes |
+| [CNES](https://cnes.datasus.gov.br) | Rede de estabelecimentos |
+| [InfoDengue](https://info.dengue.mat.br) | Casos e alerta de dengue, chikungunya e zika |
 
 **Tipografia:** os títulos usam Clash Display, da Fontshare, e o texto usa Inter (licença OFL), do Google Fonts. As duas são carregadas quando o documento é aberto. Sem internet, o documento usa Arial.
 
