@@ -34,13 +34,29 @@
 ## Como funciona
 
 ```mermaid
-flowchart LR
-  A["Você conta a dor<br>e envia planilhas"] --> B["Leitura só de totais,<br>sem dado pessoal"]
-  B --> C["Cruzamento com IBGE, Tesouro,<br>Ministério da Saúde e ANS"]
-  C --> D["Checagem de<br>cada número"]
-  D --> E["PDF em ordem<br>de importância"]
+flowchart TB
+  subgraph voce["O que você traz"]
+    A1["A dor, contada<br>na conversa"]
+    A2["Planilhas<br>CSV ou Excel"]
+  end
+  subgraph fontes["Dados públicos do município, consultados na hora"]
+    F1["IBGE<br>população, Censo e PIB"]
+    F2["Tesouro Nacional<br>gasto e quem financia"]
+    F3["Ministério da Saúde<br>APS, repasses, leitos e água"]
+    F4["ANS e InfoDengue<br>planos de saúde e dengue"]
+  end
+  A2 --> L["Leitura só de totais,<br>sem dado pessoal"]
+  A1 --> E
+  L --> E["Evidências: cada número<br>com fonte e período"]
+  F1 & F2 & F3 & F4 --> E
+  E --> R["Achados escritos<br>citando as evidências"]
+  R --> C{"Algum número fora<br>das evidências?"}
+  C -- "sim: volta e corrige" --> R
+  C -- "não" --> D["PDF em ordem<br>de importância"]
+  classDef chave fill:#4B3B8F,stroke:#4B3B8F,color:#fff
   classDef fim fill:#F2703E,stroke:#F2703E,color:#fff
-  class E fim
+  class E chave
+  class D fim
 ```
 
 - **Cada número tem origem.** Os valores saem de scripts que consultam as fontes ou leem seus arquivos, e o texto só cita esses valores. As últimas páginas do PDF dizem de onde veio cada um.
