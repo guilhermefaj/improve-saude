@@ -1,7 +1,7 @@
 """Gera o HTML A4 com a marca Improve a partir de documento.json + evidencias.json.
 
   python renderizar.py [--documento documento.json] [--evidencias evidencias.json]
-                       [--saida diagnostico.html] [--sem-checagem]
+                       [--saida diagnostico-<municipio>.html] [--sem-checagem]
 
 Roda a checagem antes e recusa gerar se ela reprovar. Os números entram pelo
 `fmt` de cada evidência; os gráficos são SVG desenhados aqui, a partir das
@@ -34,6 +34,9 @@ CONFIANCA = {"alta": "Confiança alta", "media": "Confiança média", "baixa": "
 ORIGEM = {"api": "Dado público", "arquivo": "Arquivo da secretaria", "calculo": "Cálculo", "relato": "Relato da secretaria"}
 SITE = "https://improve.business"
 EMAIL = "contato@improve.business"
+# Deixa claro que o documento não é um trabalho contratado da Improve.
+AVISO = ("Diagnóstico gerado automaticamente e de graça pelo plugin Improve · Saúde Pública, a partir de uma conversa "
+         "curta e dos dados enviados. Não é uma consultoria contratada nem foi revisado pela equipe da Improve Business.")
 MESES = ["janeiro", "fevereiro", "março", "abril", "maio", "junho", "julho", "agosto", "setembro", "outubro", "novembro", "dezembro"]
 
 esc = lambda s: html.escape(str(s if s is not None else ""), quote=True)
@@ -96,9 +99,18 @@ def texto(s, itens):
     return re.sub(r" (?=[^ \u00a0<>]{1,14}$)", "\u00a0", out)
 
 
-def lista(itens_txt, itens, cls=""):
+ROTULO = re.compile(r"^([^:{}]{1,30}):\s+(.+)$", re.S)
+
+
+def lista(itens_txt, itens, cls="", rotulos=False):
+    """rotulos=True: itens no formato "IBGE: população estimada" viram rótulo em
+    negrito e descrição na linha de baixo, todos iguais (só se todos seguirem o formato)."""
     if not itens_txt:
         return ""
+    if rotulos and all(ROTULO.match(x or "") for x in itens_txt):
+        lis = "".join(f'<li><strong class="rot">{plano(ROTULO.match(x).group(1))}</strong>{texto(ROTULO.match(x).group(2), itens)}</li>'
+                      for x in itens_txt)
+        return f'<ul class="{cls} rotulada">{lis}</ul>'
     return f'<ul class="{cls}">' + "".join(f"<li>{texto(x, itens)}</li>" for x in itens_txt) + "</ul>"
 
 
@@ -231,8 +243,12 @@ def grafico(g, ev, destaque, compacto=False):
         svg, _ = grafico_barras([], {}, realce, dados=dados, compacto=compacto)
         leg = s["rotulo"]
     else:
-        svg, prefixo = grafico_barras(g["itens"], ev["itens"], destaque, compacto=compacto)
-        periodos = sorted({str(ev["itens"][i].get("periodo")) for i in g["itens"] if ev["itens"][i].get("periodo")})
+        # laranja: o `realce` pedido; senão o número em destaque, se for uma das barras; senão a maior
+        realce = g.get("realce") if g.get("realce") in g["itens"] else destaque
+        if realce not in g["itens"]:
+            realce = max(g["itens"], key=lambda i: ev["itens"][i]["valor"])
+        svg, prefixo = grafico_barras(g["itens"], ev["itens"], realce, compacto=compacto)
+        periodos = sorted({periodo(ev["itens"][i].get("periodo")) for i in g["itens"] if ev["itens"][i].get("periodo")})
         prefixo = re.sub(r"\s+(em|de|da|do|das|dos|por|na|no|nas|nos)$", "", prefixo or "", flags=re.I)
         leg = (prefixo or "Comparação") + (" · " + " e ".join(periodos) if periodos else "")
     if not svg:
@@ -352,6 +368,20 @@ def _todos_textos(doc):
     return textos(doc)
 
 
+def fontes_base(e, ev, vistos=None):
+    """Fontes originais de um cálculo, descendo por cálculos feitos sobre outros cálculos."""
+    vistos = set() if vistos is None else vistos
+    fontes = []
+    for dep in e.get("depende_de") or []:
+        if dep in vistos:
+            continue
+        vistos.add(dep)
+        d = ev["itens"].get(dep) or ev["series"].get(dep) or {}
+        novas = fontes_base(d, ev, vistos) if d.get("origem") == "calculo" and d.get("depende_de") else [d.get("fonte")]
+        fontes += [f for f in novas if f and f not in fontes]
+    return fontes
+
+
 def rastro(doc, ev):
     linhas = ""
     for i in ids_citados(doc, ev):
@@ -372,13 +402,10 @@ def rastro(doc, ev):
                 if dep in ev["itens"]:
                     f = re.sub(rf"\b{re.escape(dep)}\b", minuscula_inicial(ev["itens"][dep]["rotulo"]), f)
             origem += f"<br><span class='formula'>{plano(f)}</span>"
+        if e.get("instavel"):
+            origem += "<br><span class='formula'>poucos casos: número instável</span>"
         if e["origem"] == "calculo" and e.get("depende_de"):
-            fontes = []
-            for dep in e["depende_de"]:
-                d = ev["itens"].get(dep) or {}
-                if d.get("fonte") and d["fonte"] not in fontes:
-                    fontes.append(d["fonte"])
-            fonte = "<br>".join(plano(f) for f in fontes) or plano(e["fonte"])
+            fonte = "<br>".join(plano(f) for f in fontes_base(e, ev)) or plano(e["fonte"])
         else:
             fonte = plano(e["fonte"])
             if e.get("url"):
@@ -429,15 +456,19 @@ a { color: __roxo__; }
 .capa { display: flex; flex-direction: column; min-height: 262mm; background: linear-gradient(180deg, __supL__ 0, #fff 110mm); border-radius: 3mm; padding: 10mm 10mm 8mm; }
 .capa-topo { display: flex; justify-content: space-between; align-items: center; }
 .logo-capa { height: 18mm; }
-.capa h1 { font-size: 36pt; margin: 14mm 0 1mm; line-height: 1.05; }
+.capa h1 { font-size: 36pt; margin: 11mm 0 1mm; line-height: 1.05; }
 .sub { color: __apoio__; font-size: 10.5pt; }
-.manchete { font-size: 19pt; margin: 10mm 0 5mm; color: __roxo__; line-height: 1.22; }
-.mensagem { font-size: 12.5pt; border-left: 3px solid __roxo__; padding-left: 4mm; margin: 0 0 9mm; }
+.manchete { font-size: 19pt; margin: 8mm 0 4mm; color: __roxo__; line-height: 1.22; }
+.mensagem { font-size: 12.5pt; border-left: 3px solid __roxo__; padding-left: 4mm; margin: 0 0 7mm; }
 .contexto { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 4mm; }
 .contexto div { background: #fff; border: 1px solid __linha__; border-top: 3px solid __laranja__; border-radius: 2.5mm; padding: 3mm 3.5mm; font-size: 9pt; }
 .contexto h4 { margin: 0 0 1.5mm; font-size: 8pt; text-transform: uppercase; letter-spacing: .06em; color: __apoio__; }
 .contexto ul { margin: 0; padding-left: 4mm; }
-.para { margin-top: auto; padding-top: 8mm; font-size: 9pt; color: __apoio__; }
+.contexto ul.rotulada { list-style: none; padding-left: 0; }
+.contexto ul.rotulada li + li { margin-top: 1.2mm; }
+.contexto .rot { display: block; font-weight: 600; color: __texto__; }
+.aviso { margin: 1.5mm 0 0; font-size: 7.3pt; line-height: 1.4; color: __apoio__; max-width: 150mm; }
+.para { margin-top: auto; padding-top: 5mm; font-size: 9pt; color: __apoio__; }
 .sub .seg { white-space: nowrap; }
 /* insight principal */
 .hero-titulo { font-size: 21pt; line-height: 1.15; margin: 1mm 0 5mm; }
@@ -461,7 +492,7 @@ a { color: __roxo__; }
 .sec-pe .implicacao { margin: 3mm 0 0; font-size: 9.5pt; }
 .sec-pe .acoes { margin-top: 3mm; font-size: 9.2pt; }
 .sec-pe:has(> :only-child) { grid-template-columns: 1fr; }
-.kpis { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4mm; margin: 0 0 8mm; }
+.kpis { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4mm; margin: 0 0 6mm; }
 .kpi-card { background: #fff; border-radius: 2.5mm; padding: 3.5mm 4mm; border: 1px solid __linha__; }
 .kpi-card .kpi { font-size: 22pt; color: __laranja__; line-height: 1.05; white-space: nowrap; }
 .kpi-card .kpi-rot { font-size: 8.3pt; margin-top: 1.5mm; line-height: 1.3; }
@@ -518,11 +549,12 @@ def render(doc, ev):
   <div class="mensagem">{texto(doc["mensagem_principal"], it)}</div>
   <div class="kpis">{kpis}</div>
   <div class="contexto">
-    <div><h4>O que você nos contou</h4>{texto(ctx.get("dor", ""), it)}</div>
-    <div><h4>O que você enviou</h4>{lista(ctx.get("material_recebido"), it) or "Só a conversa."}</div>
-    <div><h4>Com o que cruzamos</h4>{lista(ctx.get("fontes_cruzadas"), it)}</div>
+    <div><h4>O que você contou</h4>{texto(ctx.get("dor", ""), it)}</div>
+    <div><h4>O que você enviou</h4>{lista(ctx.get("material_recebido"), it, rotulos=True) or "Só a conversa."}</div>
+    <div><h4>Com o que cruzamos</h4>{lista(ctx.get("fontes_cruzadas"), it, rotulos=True)}</div>
   </div>
   <p class="para">{"Preparado para: " + plano(" · ".join(x for x in [para.get("cargo"), para.get("orgao")] if x)) if para else ""}</p>
+  <p class="aviso">{plano(AVISO)}</p>
 </section>"""
     paginas = [capa, insight_principal(ins[0], ev, municipio, logo, marca)]
     if len(ins) > 1:
@@ -551,11 +583,12 @@ def render(doc, ev):
     paginas.append(f"""<section class="pagina" data-nome="De onde vem cada número">{marca}{topo(municipio, "De onde vem cada número", logo)}
   <table class="rastro"><colgroup><col style="width:30%"><col style="width:14%"><col style="width:14%"><col style="width:24%"><col style="width:18%"></colgroup><thead><tr><th>Indicador</th><th>Valor</th><th>Período</th><th>Fonte</th><th>Origem</th></tr></thead>
   <tbody>{rastro(doc, ev)}</tbody></table>
-  <div class="metodo"><p><strong>Como este documento foi feito.</strong> Ele foi produzido com a skill Diagnóstico de Saúde Pública,
-  da <a href="{SITE}">Improve Business</a>, a partir de dados públicos agregados por município e do material que a secretaria compartilhou na conversa.
+  <div class="metodo"><p><strong>Como este documento foi feito.</strong> {plano(AVISO)} Ele foi montado
+  a partir de dados públicos agregados por município e do material que a secretaria compartilhou na conversa.
   Nenhum dado pessoal foi usado ou citado. Os textos foram redigidos com apoio de inteligência artificial. Todos os números saíram
   das fontes acima e passaram por uma checagem automática antes da geração. Números sublinhados com pontilhado foram informados pela
-  secretaria e não foram conferidos em fonte oficial.</p><p>Gerado em {esc(data_extenso())}.</p></div>
+  secretaria e não foram conferidos em fonte oficial.</p><p>Gerado em {esc(data_extenso())} pelo plugin
+  <a href="{SITE}">Improve · Saúde Pública</a>, versão {c.VERSAO}.</p></div>
 </section>""")
     css = CSS + (f":root {{ --logo: url('{logo}'); }}" if logo else "")
     for k, v in C.items():
@@ -569,7 +602,7 @@ def main():
     p = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     p.add_argument("--documento", default="documento.json")
     p.add_argument("--evidencias")
-    p.add_argument("--saida", default="diagnostico.html")
+    p.add_argument("--saida", help="padrão: diagnostico-<municipio>.html")
     p.add_argument("--sem-checagem", action="store_true", help="só para depurar o layout; nunca para entregar")
     a = p.parse_args()
     with open(a.documento, encoding="utf-8") as f:
@@ -580,9 +613,11 @@ def main():
         if not r["ok"]:
             print("Checagem reprovada. Rode: python checagem.py, corrija e gere de novo.")
             sys.exit(1)
-    with open(a.saida, "w", encoding="utf-8") as f:
+    nome = (ev.get("municipio") or {}).get("nome")
+    saida = a.saida or (f"diagnostico-{c.slug(nome)}.html" if nome else "diagnostico.html")
+    with open(saida, "w", encoding="utf-8") as f:
         f.write(render(doc, ev))
-    print(f"HTML gerado: {os.path.abspath(a.saida)}")
+    print(f"HTML gerado: {os.path.abspath(saida)}")
 
 
 if __name__ == "__main__":

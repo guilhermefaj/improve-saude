@@ -20,7 +20,9 @@ NUMERO = re.compile(r"(?<![\w{])(\d{1,3}(?:\.\d{3})+(?:,\d+)?|\d+(?:,\d+)?)(\s*(
 TIPOS = {"alerta", "oportunidade", "tendencia", "comparacao", "eficiencia", "risco"}
 CONFIANCA = {"alta", "media", "baixa"}
 PESSOAL = re.compile(r"\b\d{3}\.\d{3}\.\d{3}-\d{2}\b|\b[1-2789]\d{14}\b|[^@\s]+@[^@\s]+\.[a-z]{2,}|\(?\d{2}\)?\s?9\d{4}-?\d{4}", re.I)
-LIMITES = {"titulo": 110, "mensagem_principal": 260, "insights.titulo": 70, "achado": 420, "implicacao": 420}
+# a capa e a página dos achados 2 e 3 são as que mais estouram: os limites delas são menores
+LIMITES = {"titulo": 85, "subtitulo": 70, "mensagem_principal": 220, "contexto.dor": 120,
+           "insights.titulo": 70, "achado": 420, "implicacao": 420, "sec.achado": 240, "sec.implicacao": 290}
 
 
 def textos(doc):
@@ -79,6 +81,15 @@ def checar(doc, ev):
                 exige(all(isinstance(itens[x]["valor"], (int, float)) for x in ids if x in itens), f"{p}.grafico: item sem valor numérico")
             else:
                 problemas.append(f"{p}.grafico.tipo deve ser 'serie' ou 'barras'")
+    # ---------- números instáveis (taxa sobre poucos casos) precisam de aviso no próprio insight
+    for n, i in enumerate(ins):
+        citados = {mt.group(1) for _, s in textos(i) for mt in MARCADOR.finditer(s)}
+        citados |= {i.get("destaque")} | set(i.get("evidencias") or [])
+        instaveis = sorted(x for x in citados if x in itens and itens[x].get("instavel"))
+        lim = c.norm(i.get("limites") or "")
+        if instaveis and not re.search(r"instav|poucos casos|numero pequeno|numeros pequenos|poucos registros", lim):
+            problemas.append(f"insights[{n}] usa número instável ({', '.join(instaveis)}): diga em 'limites' que a conta "
+                             "se apoia em poucos casos (use a palavra 'instável' ou 'poucos casos')")
     for k in ("hipoteses", "perguntas", "proximos_passos"):
         exige(len(doc.get(k) or []) <= 4, f"{k}: no máximo 4 itens")
     para = doc.get("para") or {}
@@ -87,16 +98,18 @@ def checar(doc, ev):
     # ---------- tamanhos (contados sem os marcadores)
     def tam(s):
         return len(MARCADOR.sub("00,0%", s or ""))
-    if tam(doc.get("titulo")) > LIMITES["titulo"]:
-        problemas.append(f"titulo passa de {LIMITES['titulo']} caracteres")
-    if tam(doc.get("mensagem_principal")) > LIMITES["mensagem_principal"]:
-        problemas.append(f"mensagem_principal passa de {LIMITES['mensagem_principal']} caracteres")
+    def limite(caminho, s, chave):
+        if tam(s) > LIMITES[chave]:
+            problemas.append(f"{caminho} tem {tam(s)} caracteres; o limite é {LIMITES[chave]} para caber na página")
+    limite("titulo", doc.get("titulo"), "titulo")
+    limite("subtitulo", doc.get("subtitulo"), "subtitulo")
+    limite("mensagem_principal", doc.get("mensagem_principal"), "mensagem_principal")
+    limite("contexto.dor", (doc.get("contexto") or {}).get("dor"), "contexto.dor")
     for n, i in enumerate(ins):
-        if tam(i.get("titulo")) > LIMITES["insights.titulo"]:
-            problemas.append(f"insights[{n}].titulo passa de {LIMITES['insights.titulo']} caracteres")
+        limite(f"insights[{n}].titulo", i.get("titulo"), "insights.titulo")
+        sec = i.get("prioridade") in (2, 3)  # meia página cada
         for k in ("achado", "implicacao"):
-            if tam(i.get(k)) > LIMITES[k]:
-                problemas.append(f"insights[{n}].{k} passa de {LIMITES[k]} caracteres")
+            limite(f"insights[{n}].{k}" + (" (achado 2 ou 3, meia página)" if sec else ""), i.get(k), ("sec." if sec else "") + k)
 
     # ---------- marcadores e números soltos
     for caminho, s in textos(doc):

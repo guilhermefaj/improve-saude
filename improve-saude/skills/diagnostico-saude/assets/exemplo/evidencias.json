@@ -1,0 +1,1035 @@
+{
+  "versao": 1,
+  "municipio": {
+    "ibge": "3152501",
+    "ibge6": "315250",
+    "nome": "Pouso Alegre",
+    "uf": "MG",
+    "microrregiao": "Pouso Alegre",
+    "regiao_imediata": "Pouso Alegre",
+    "fonte": "IBGE Localidades",
+    "regiao_saude": "POUSO ALEGRE/SANTA RITA DO SAPUCAI",
+    "macrorregiao_saude": "EXTREMO SUL"
+  },
+  "itens": {
+    "pop": {
+      "rotulo": "População estimada",
+      "valor": 163439,
+      "fmt": "163.439",
+      "unidade": "habitantes",
+      "periodo": "2026",
+      "fonte": "IBGE, Estimativas de População (tabela 6579)",
+      "url": "https://sidra.ibge.gov.br/tabela/6579",
+      "origem": "api",
+      "registrado_em": "2026-11-25T08:52:39-03:00"
+    },
+    "asps_valor": {
+      "rotulo": "Despesa em saúde com recursos próprios (impostos)",
+      "valor": 171415383.33,
+      "fmt": "R$ 171,4 milhões",
+      "unidade": "R$",
+      "periodo": "2025 (até o 6º bimestre)",
+      "fonte": "Siconfi/Tesouro Nacional, RREO Anexo 14",
+      "url": "https://apidatalake.tesouro.gov.br/ords/siconfi/tt/rreo?an_exercicio=2025&nr_periodo=6&co_tipo_demonstrativo=RREO&no_anexo=RREO-Anexo%2014&id_ente=3152501",
+      "origem": "api",
+      "registrado_em": "2026-11-25T08:52:40-03:00"
+    },
+    "asps_minimo": {
+      "rotulo": "Mínimo constitucional para municípios",
+      "valor": 15.0,
+      "fmt": "15%",
+      "unidade": "%",
+      "periodo": "2025 (até o 6º bimestre)",
+      "fonte": "Siconfi/Tesouro Nacional, RREO Anexo 14",
+      "url": "https://apidatalake.tesouro.gov.br/ords/siconfi/tt/rreo?an_exercicio=2025&nr_periodo=6&co_tipo_demonstrativo=RREO&no_anexo=RREO-Anexo%2014&id_ente=3152501",
+      "origem": "api",
+      "registrado_em": "2026-11-25T08:52:40-03:00"
+    },
+    "asps_pct": {
+      "rotulo": "Receita própria aplicada em saúde",
+      "valor": 21.04,
+      "fmt": "21,0%",
+      "unidade": "%",
+      "periodo": "2025 (até o 6º bimestre)",
+      "fonte": "Siconfi/Tesouro Nacional, RREO Anexo 14",
+      "url": "https://apidatalake.tesouro.gov.br/ords/siconfi/tt/rreo?an_exercicio=2025&nr_periodo=6&co_tipo_demonstrativo=RREO&no_anexo=RREO-Anexo%2014&id_ente=3152501",
+      "origem": "api",
+      "registrado_em": "2026-11-25T08:52:40-03:00"
+    },
+    "desp_saude_liq": {
+      "rotulo": "Despesa liquidada em saúde (total)",
+      "valor": 412528476.93,
+      "fmt": "R$ 412,5 milhões",
+      "unidade": "R$",
+      "periodo": "2025",
+      "fonte": "Siconfi/Tesouro Nacional, DCA Anexo I-E",
+      "url": "https://apidatalake.tesouro.gov.br/ords/siconfi/tt/dca?an_exercicio=2025&no_anexo=DCA-Anexo%20I-E&id_ente=3152501",
+      "origem": "api",
+      "registrado_em": "2026-11-25T08:52:40-03:00"
+    },
+    "desp_ab_liq": {
+      "rotulo": "Despesa liquidada em atenção básica",
+      "valor": 44608117.5,
+      "fmt": "R$ 44,6 milhões",
+      "unidade": "R$",
+      "periodo": "2025",
+      "fonte": "Siconfi/Tesouro Nacional, DCA Anexo I-E",
+      "url": "https://apidatalake.tesouro.gov.br/ords/siconfi/tt/dca?an_exercicio=2025&no_anexo=DCA-Anexo%20I-E&id_ente=3152501",
+      "origem": "api",
+      "registrado_em": "2026-11-25T08:52:40-03:00"
+    },
+    "desp_hosp_liq": {
+      "rotulo": "Despesa liquidada em assistência hospitalar e ambulatorial",
+      "valor": 279177880.01,
+      "fmt": "R$ 279,2 milhões",
+      "unidade": "R$",
+      "periodo": "2025",
+      "fonte": "Siconfi/Tesouro Nacional, DCA Anexo I-E",
+      "url": "https://apidatalake.tesouro.gov.br/ords/siconfi/tt/dca?an_exercicio=2025&no_anexo=DCA-Anexo%20I-E&id_ente=3152501",
+      "origem": "api",
+      "registrado_em": "2026-11-25T08:52:40-03:00"
+    },
+    "desp_farm_liq": {
+      "rotulo": "Despesa liquidada em suporte profilático e terapêutico",
+      "valor": 5475573.88,
+      "fmt": "R$ 5,5 milhões",
+      "unidade": "R$",
+      "periodo": "2025",
+      "fonte": "Siconfi/Tesouro Nacional, DCA Anexo I-E",
+      "url": "https://apidatalake.tesouro.gov.br/ords/siconfi/tt/dca?an_exercicio=2025&no_anexo=DCA-Anexo%20I-E&id_ente=3152501",
+      "origem": "api",
+      "registrado_em": "2026-11-25T08:52:40-03:00"
+    },
+    "desp_vigsan_liq": {
+      "rotulo": "Despesa liquidada em vigilância sanitária",
+      "valor": 6227045.96,
+      "fmt": "R$ 6,2 milhões",
+      "unidade": "R$",
+      "periodo": "2025",
+      "fonte": "Siconfi/Tesouro Nacional, DCA Anexo I-E",
+      "url": "https://apidatalake.tesouro.gov.br/ords/siconfi/tt/dca?an_exercicio=2025&no_anexo=DCA-Anexo%20I-E&id_ente=3152501",
+      "origem": "api",
+      "registrado_em": "2026-11-25T08:52:40-03:00"
+    },
+    "desp_vigepi_liq": {
+      "rotulo": "Despesa liquidada em vigilância epidemiológica",
+      "valor": 9146952.11,
+      "fmt": "R$ 9,1 milhões",
+      "unidade": "R$",
+      "periodo": "2025",
+      "fonte": "Siconfi/Tesouro Nacional, DCA Anexo I-E",
+      "url": "https://apidatalake.tesouro.gov.br/ords/siconfi/tt/dca?an_exercicio=2025&no_anexo=DCA-Anexo%20I-E&id_ente=3152501",
+      "origem": "api",
+      "registrado_em": "2026-11-25T08:52:40-03:00"
+    },
+    "desp_adm_liq": {
+      "rotulo": "Despesa liquidada em administração geral da saúde",
+      "valor": 67891226.03,
+      "fmt": "R$ 67,9 milhões",
+      "unidade": "R$",
+      "periodo": "2025",
+      "fonte": "Siconfi/Tesouro Nacional, DCA Anexo I-E",
+      "url": "https://apidatalake.tesouro.gov.br/ords/siconfi/tt/dca?an_exercicio=2025&no_anexo=DCA-Anexo%20I-E&id_ente=3152501",
+      "origem": "api",
+      "registrado_em": "2026-11-25T08:52:40-03:00"
+    },
+    "ab_part_pct": {
+      "rotulo": "Parcela da despesa em saúde que foi para a atenção básica",
+      "valor": 10.813342591999858,
+      "fmt": "10,8%",
+      "unidade": "%",
+      "periodo": "2025",
+      "fonte": "Cálculo sobre Siconfi (DCA Anexo I-E)",
+      "url": "https://apidatalake.tesouro.gov.br/ords/siconfi/tt/dca?an_exercicio=2025&no_anexo=DCA-Anexo%20I-E&id_ente=3152501",
+      "origem": "calculo",
+      "registrado_em": "2026-11-25T08:52:40-03:00",
+      "formula": "desp_ab_liq / desp_saude_liq × 100",
+      "depende_de": [
+        "desp_ab_liq",
+        "desp_saude_liq"
+      ]
+    },
+    "desp_saude_hab": {
+      "rotulo": "Despesa liquidada em saúde por habitante",
+      "valor": 2524.051645751626,
+      "fmt": "R$ 2.524",
+      "unidade": "R$",
+      "periodo": "2025 (população 2026)",
+      "fonte": "Cálculo sobre Siconfi (DCA) e IBGE",
+      "url": "https://apidatalake.tesouro.gov.br/ords/siconfi/tt/dca?an_exercicio=2025&no_anexo=DCA-Anexo%20I-E&id_ente=3152501",
+      "origem": "calculo",
+      "registrado_em": "2026-11-25T08:52:40-03:00",
+      "formula": "desp_saude_liq / pop",
+      "depende_de": [
+        "desp_saude_liq",
+        "pop"
+      ]
+    },
+    "dengue_casos_2026": {
+      "rotulo": "Casos notificados de dengue em 2026 (até a SE 45/2026)",
+      "valor": 819,
+      "fmt": "819",
+      "unidade": "casos",
+      "periodo": "2026",
+      "fonte": "InfoDengue (Fiocruz/FGV), casos notificados",
+      "url": "https://info.dengue.mat.br/alerta/3152501/dengue",
+      "origem": "api",
+      "registrado_em": "2026-11-25T08:52:42-03:00"
+    },
+    "dengue_nivel_atual": {
+      "rotulo": "Nível de alerta de dengue na última semana",
+      "valor": 1,
+      "fmt": "nível 1 (verde)",
+      "unidade": "nível",
+      "periodo": "SE 45/2026",
+      "fonte": "InfoDengue (Fiocruz/FGV), casos notificados",
+      "url": "https://info.dengue.mat.br/alerta/3152501/dengue",
+      "origem": "api",
+      "registrado_em": "2026-11-25T08:52:42-03:00"
+    },
+    "dengue_pico_2026": {
+      "rotulo": "Maior número semanal de casos de dengue em 2026",
+      "valor": 46,
+      "fmt": "46",
+      "unidade": "casos",
+      "periodo": "SE 01/2026",
+      "fonte": "InfoDengue (Fiocruz/FGV), casos notificados",
+      "url": "https://info.dengue.mat.br/alerta/3152501/dengue",
+      "origem": "api",
+      "registrado_em": "2026-11-25T08:52:42-03:00"
+    },
+    "dengue_inc_2026": {
+      "rotulo": "Casos de dengue por 100 mil habitantes em 2026",
+      "valor": 501.1043875696743,
+      "fmt": "501,1",
+      "unidade": "por 100 mil hab.",
+      "periodo": "2026",
+      "fonte": "Cálculo sobre InfoDengue e IBGE",
+      "url": "https://info.dengue.mat.br/alerta/3152501/dengue",
+      "origem": "calculo",
+      "registrado_em": "2026-11-25T08:52:42-03:00",
+      "formula": "dengue_casos_2026 / pop × 100.000",
+      "depende_de": [
+        "dengue_casos_2026",
+        "pop"
+      ]
+    },
+    "cnes_total": {
+      "rotulo": "Estabelecimentos de saúde cadastrados no CNES (públicos e privados)",
+      "valor": 1677,
+      "fmt": "1.677",
+      "unidade": "estabelecimentos",
+      "periodo": "2026-11",
+      "fonte": "CNES/Ministério da Saúde (API de Dados Abertos)",
+      "url": "https://apidadosabertos.saude.gov.br/cnes/estabelecimentos?codigo_municipio=315250",
+      "origem": "api",
+      "registrado_em": "2026-11-25T08:54:39-03:00"
+    },
+    "cnes_sus_amb": {
+      "rotulo": "Estabelecimentos com atendimento ambulatorial pelo SUS",
+      "valor": 64,
+      "fmt": "64",
+      "unidade": "estabelecimentos",
+      "periodo": "2026-11",
+      "fonte": "CNES/Ministério da Saúde (API de Dados Abertos)",
+      "url": "https://apidadosabertos.saude.gov.br/cnes/estabelecimentos?codigo_municipio=315250",
+      "origem": "api",
+      "registrado_em": "2026-11-25T08:54:39-03:00"
+    },
+    "cnes_hospitalar": {
+      "rotulo": "Estabelecimentos com atendimento hospitalar",
+      "valor": 7,
+      "fmt": "7",
+      "unidade": "estabelecimentos",
+      "periodo": "2026-11",
+      "fonte": "CNES/Ministério da Saúde (API de Dados Abertos)",
+      "url": "https://apidadosabertos.saude.gov.br/cnes/estabelecimentos?codigo_municipio=315250",
+      "origem": "api",
+      "registrado_em": "2026-11-25T08:54:39-03:00"
+    },
+    "cnes_tipo_01": {
+      "rotulo": "Postos de saúde",
+      "valor": 10,
+      "fmt": "10",
+      "unidade": "estabelecimentos",
+      "periodo": "2026-11",
+      "fonte": "CNES/Ministério da Saúde (API de Dados Abertos)",
+      "url": "https://apidadosabertos.saude.gov.br/cnes/estabelecimentos?codigo_municipio=315250&codigo_tipo_unidade=1",
+      "origem": "api",
+      "registrado_em": "2026-11-25T08:54:39-03:00"
+    },
+    "cnes_tipo_02": {
+      "rotulo": "Centros de saúde / UBS",
+      "valor": 28,
+      "fmt": "28",
+      "unidade": "estabelecimentos",
+      "periodo": "2026-11",
+      "fonte": "CNES/Ministério da Saúde (API de Dados Abertos)",
+      "url": "https://apidadosabertos.saude.gov.br/cnes/estabelecimentos?codigo_municipio=315250&codigo_tipo_unidade=2",
+      "origem": "api",
+      "registrado_em": "2026-11-25T08:54:39-03:00"
+    },
+    "cnes_tipo_04": {
+      "rotulo": "Policlínicas",
+      "valor": 3,
+      "fmt": "3",
+      "unidade": "estabelecimentos",
+      "periodo": "2026-11",
+      "fonte": "CNES/Ministério da Saúde (API de Dados Abertos)",
+      "url": "https://apidadosabertos.saude.gov.br/cnes/estabelecimentos?codigo_municipio=315250&codigo_tipo_unidade=4",
+      "origem": "api",
+      "registrado_em": "2026-11-25T08:54:39-03:00"
+    },
+    "cnes_tipo_05": {
+      "rotulo": "Hospitais gerais",
+      "valor": 3,
+      "fmt": "3",
+      "unidade": "estabelecimentos",
+      "periodo": "2026-11",
+      "fonte": "CNES/Ministério da Saúde (API de Dados Abertos)",
+      "url": "https://apidadosabertos.saude.gov.br/cnes/estabelecimentos?codigo_municipio=315250&codigo_tipo_unidade=5",
+      "origem": "api",
+      "registrado_em": "2026-11-25T08:54:39-03:00"
+    },
+    "cnes_tipo_36": {
+      "rotulo": "Clínicas e centros de especialidade",
+      "valor": 30,
+      "fmt": "30",
+      "unidade": "estabelecimentos",
+      "periodo": "2026-11",
+      "fonte": "CNES/Ministério da Saúde (API de Dados Abertos)",
+      "url": "https://apidadosabertos.saude.gov.br/cnes/estabelecimentos?codigo_municipio=315250&codigo_tipo_unidade=36",
+      "origem": "api",
+      "registrado_em": "2026-11-25T08:54:39-03:00"
+    },
+    "cnes_tipo_70": {
+      "rotulo": "CAPS",
+      "valor": 3,
+      "fmt": "3",
+      "unidade": "estabelecimentos",
+      "periodo": "2026-11",
+      "fonte": "CNES/Ministério da Saúde (API de Dados Abertos)",
+      "url": "https://apidadosabertos.saude.gov.br/cnes/estabelecimentos?codigo_municipio=315250&codigo_tipo_unidade=70",
+      "origem": "api",
+      "registrado_em": "2026-11-25T08:54:39-03:00"
+    },
+    "cnes_tipo_73": {
+      "rotulo": "Pronto atendimento (UPA)",
+      "valor": 4,
+      "fmt": "4",
+      "unidade": "estabelecimentos",
+      "periodo": "2026-11",
+      "fonte": "CNES/Ministério da Saúde (API de Dados Abertos)",
+      "url": "https://apidadosabertos.saude.gov.br/cnes/estabelecimentos?codigo_municipio=315250&codigo_tipo_unidade=73",
+      "origem": "api",
+      "registrado_em": "2026-11-25T08:54:39-03:00"
+    },
+    "hab_por_ubs": {
+      "rotulo": "Habitantes por UBS ou posto de saúde",
+      "valor": 4301.026315789473,
+      "fmt": "4.301",
+      "unidade": "habitantes",
+      "periodo": "2026-11",
+      "fonte": "Cálculo sobre CNES e IBGE",
+      "url": "https://apidadosabertos.saude.gov.br/cnes/estabelecimentos?codigo_municipio=315250",
+      "origem": "calculo",
+      "registrado_em": "2026-11-25T08:54:39-03:00",
+      "formula": "pop / (cnes_tipo_02 + cnes_tipo_01)",
+      "depende_de": [
+        "pop",
+        "cnes_tipo_02",
+        "cnes_tipo_01"
+      ]
+    },
+    "atend_mes_total": {
+      "rotulo": "Atendimentos médicos nas UBS por mês (total)",
+      "valor": 49071.0,
+      "fmt": "49.071",
+      "unidade": "atendimentos",
+      "periodo": "jan a out 2026",
+      "fonte": "Arquivo enviado pela secretaria: atendimentos_ficticio.csv",
+      "url": null,
+      "origem": "arquivo",
+      "registrado_em": "2026-11-25T08:56:31-03:00"
+    },
+    "faltas_ubs_total": {
+      "rotulo": "Faltas por UBS (total)",
+      "valor": 6505.0,
+      "fmt": "6.505",
+      "unidade": "faltas",
+      "periodo": "jan a out 2026",
+      "fonte": "Arquivo enviado pela secretaria: atendimentos_ficticio.csv",
+      "url": null,
+      "origem": "arquivo",
+      "registrado_em": "2026-11-25T08:56:31-03:00"
+    },
+    "fila_esp_total": {
+      "rotulo": "Pessoas na fila por especialidade (total)",
+      "valor": 78,
+      "fmt": "78",
+      "unidade": "pessoas",
+      "periodo": null,
+      "fonte": "Arquivo enviado pela secretaria: fila_ficticia.xlsx (aba Fila)",
+      "url": null,
+      "origem": "arquivo",
+      "registrado_em": "2026-11-25T08:56:32-03:00"
+    },
+    "faltas_pct": {
+      "rotulo": "Faltas sobre atendimentos",
+      "valor": 13.256302092885818,
+      "fmt": "13,3%",
+      "unidade": "%",
+      "periodo": "jan a out 2026",
+      "fonte": "Cálculo sobre: Arquivo enviado pela secretaria: atendimentos_ficticio.csv",
+      "url": null,
+      "origem": "calculo",
+      "registrado_em": "2026-11-25T08:56:32-03:00",
+      "formula": "faltas_ubs_total / atend_mes_total × 100",
+      "depende_de": [
+        "faltas_ubs_total",
+        "atend_mes_total"
+      ]
+    },
+    "atend_por_hab": {
+      "rotulo": "Atendimentos médicos nas UBS por mil habitantes",
+      "valor": 300.24045668414516,
+      "fmt": "300",
+      "unidade": "por 1.000",
+      "periodo": "2026 e jan a out 2026",
+      "fonte": "Cálculo sobre: Arquivo enviado pela secretaria: atendimentos_ficticio.csv; IBGE, Estimativas de População (tabela 6579)",
+      "url": null,
+      "origem": "calculo",
+      "registrado_em": "2026-11-25T08:56:32-03:00",
+      "formula": "atend_mes_total / pop × 1.000",
+      "depende_de": [
+        "atend_mes_total",
+        "pop"
+      ]
+    },
+    "equipes_esf_relato": {
+      "rotulo": "Equipes de Saúde da Família (informado pela secretaria)",
+      "valor": 32.0,
+      "fmt": "32",
+      "unidade": "equipes",
+      "periodo": "nov 2026",
+      "fonte": "Relato da secretaria na conversa",
+      "url": null,
+      "origem": "relato",
+      "registrado_em": "2026-11-25T09:01:10-03:00"
+    },
+    "faltas_por_equipe": {
+      "rotulo": "Faltas por equipe de Saúde da Família no período",
+      "valor": 203.28125,
+      "fmt": "203",
+      "unidade": "faltas",
+      "periodo": "jan a out 2026 e nov 2026",
+      "fonte": "Cálculo sobre: Arquivo enviado pela secretaria: atendimentos_ficticio.csv; Relato da secretaria na conversa",
+      "url": null,
+      "origem": "calculo",
+      "registrado_em": "2026-11-25T09:01:20-03:00",
+      "formula": "faltas_ubs_total / equipes_esf_relato",
+      "depende_de": [
+        "faltas_ubs_total",
+        "equipes_esf_relato"
+      ]
+    }
+  },
+  "series": {
+    "dengue_sem_2026": {
+      "rotulo": "Casos notificados de dengue por semana em 2026",
+      "unidade": "casos",
+      "fonte": "InfoDengue (Fiocruz/FGV), casos notificados",
+      "url": "https://info.dengue.mat.br/alerta/3152501/dengue",
+      "origem": "api",
+      "registrado_em": "2026-11-25T08:52:42-03:00",
+      "pontos": [
+        {
+          "periodo": "SE 01",
+          "valor": 46,
+          "fmt": "46"
+        },
+        {
+          "periodo": "SE 02",
+          "valor": 21,
+          "fmt": "21"
+        },
+        {
+          "periodo": "SE 03",
+          "valor": 29,
+          "fmt": "29"
+        },
+        {
+          "periodo": "SE 04",
+          "valor": 23,
+          "fmt": "23"
+        },
+        {
+          "periodo": "SE 05",
+          "valor": 34,
+          "fmt": "34"
+        },
+        {
+          "periodo": "SE 06",
+          "valor": 19,
+          "fmt": "19"
+        },
+        {
+          "periodo": "SE 07",
+          "valor": 39,
+          "fmt": "39"
+        },
+        {
+          "periodo": "SE 08",
+          "valor": 29,
+          "fmt": "29"
+        },
+        {
+          "periodo": "SE 09",
+          "valor": 32,
+          "fmt": "32"
+        },
+        {
+          "periodo": "SE 10",
+          "valor": 44,
+          "fmt": "44"
+        },
+        {
+          "periodo": "SE 11",
+          "valor": 19,
+          "fmt": "19"
+        },
+        {
+          "periodo": "SE 12",
+          "valor": 27,
+          "fmt": "27"
+        },
+        {
+          "periodo": "SE 13",
+          "valor": 28,
+          "fmt": "28"
+        },
+        {
+          "periodo": "SE 14",
+          "valor": 29,
+          "fmt": "29"
+        },
+        {
+          "periodo": "SE 15",
+          "valor": 25,
+          "fmt": "25"
+        },
+        {
+          "periodo": "SE 16",
+          "valor": 26,
+          "fmt": "26"
+        },
+        {
+          "periodo": "SE 17",
+          "valor": 16,
+          "fmt": "16"
+        },
+        {
+          "periodo": "SE 18",
+          "valor": 31,
+          "fmt": "31"
+        },
+        {
+          "periodo": "SE 19",
+          "valor": 26,
+          "fmt": "26"
+        },
+        {
+          "periodo": "SE 20",
+          "valor": 30,
+          "fmt": "30"
+        },
+        {
+          "periodo": "SE 21",
+          "valor": 14,
+          "fmt": "14"
+        },
+        {
+          "periodo": "SE 22",
+          "valor": 11,
+          "fmt": "11"
+        },
+        {
+          "periodo": "SE 23",
+          "valor": 8,
+          "fmt": "8"
+        },
+        {
+          "periodo": "SE 24",
+          "valor": 9,
+          "fmt": "9"
+        },
+        {
+          "periodo": "SE 25",
+          "valor": 16,
+          "fmt": "16"
+        },
+        {
+          "periodo": "SE 26",
+          "valor": 12,
+          "fmt": "12"
+        },
+        {
+          "periodo": "SE 27",
+          "valor": 4,
+          "fmt": "4"
+        },
+        {
+          "periodo": "SE 28",
+          "valor": 5,
+          "fmt": "5"
+        },
+        {
+          "periodo": "SE 29",
+          "valor": 12,
+          "fmt": "12"
+        },
+        {
+          "periodo": "SE 30",
+          "valor": 6,
+          "fmt": "6"
+        },
+        {
+          "periodo": "SE 31",
+          "valor": 1,
+          "fmt": "1"
+        },
+        {
+          "periodo": "SE 32",
+          "valor": 3,
+          "fmt": "3"
+        },
+        {
+          "periodo": "SE 33",
+          "valor": 4,
+          "fmt": "4"
+        },
+        {
+          "periodo": "SE 34",
+          "valor": 2,
+          "fmt": "2"
+        },
+        {
+          "periodo": "SE 35",
+          "valor": 9,
+          "fmt": "9"
+        },
+        {
+          "periodo": "SE 36",
+          "valor": 6,
+          "fmt": "6"
+        },
+        {
+          "periodo": "SE 37",
+          "valor": 16,
+          "fmt": "16"
+        },
+        {
+          "periodo": "SE 38",
+          "valor": 15,
+          "fmt": "15"
+        },
+        {
+          "periodo": "SE 39",
+          "valor": 11,
+          "fmt": "11"
+        },
+        {
+          "periodo": "SE 40",
+          "valor": 12,
+          "fmt": "12"
+        },
+        {
+          "periodo": "SE 41",
+          "valor": 19,
+          "fmt": "19"
+        },
+        {
+          "periodo": "SE 42",
+          "valor": 17,
+          "fmt": "17"
+        },
+        {
+          "periodo": "SE 43",
+          "valor": 18,
+          "fmt": "18"
+        },
+        {
+          "periodo": "SE 44",
+          "valor": 16,
+          "fmt": "16"
+        },
+        {
+          "periodo": "SE 45",
+          "valor": 0,
+          "fmt": "0"
+        }
+      ]
+    },
+    "clima_temp_2026": {
+      "rotulo": "Temperatura média semanal em 2026",
+      "unidade": "°C",
+      "fonte": "InfoDengue (dados climáticos)",
+      "url": "https://info.dengue.mat.br/alerta/3152501/dengue",
+      "origem": "api",
+      "registrado_em": "2026-11-25T08:52:42-03:00",
+      "pontos": [
+        {
+          "periodo": "SE 01",
+          "valor": "21.7193285714286",
+          "fmt": "21,7"
+        },
+        {
+          "periodo": "SE 02",
+          "valor": "21.6914428571429",
+          "fmt": "21,7"
+        },
+        {
+          "periodo": "SE 03",
+          "valor": "18.8749428571429",
+          "fmt": "18,9"
+        },
+        {
+          "periodo": "SE 04",
+          "valor": "20.6535714285714",
+          "fmt": "20,7"
+        },
+        {
+          "periodo": "SE 05",
+          "valor": "21.0618",
+          "fmt": "21,1"
+        },
+        {
+          "periodo": "SE 06",
+          "valor": "20.6859",
+          "fmt": "20,7"
+        },
+        {
+          "periodo": "SE 07",
+          "valor": "23.0930285714286",
+          "fmt": "23,1"
+        },
+        {
+          "periodo": "SE 08",
+          "valor": "21.3825",
+          "fmt": "21,4"
+        },
+        {
+          "periodo": "SE 09",
+          "valor": "20.9010285714286",
+          "fmt": "20,9"
+        },
+        {
+          "periodo": "SE 10",
+          "valor": "20.3033714285714",
+          "fmt": "20,3"
+        },
+        {
+          "periodo": "SE 11",
+          "valor": "22.0074714285714",
+          "fmt": "22,0"
+        },
+        {
+          "periodo": "SE 12",
+          "valor": "21.3615714285714",
+          "fmt": "21,4"
+        },
+        {
+          "periodo": "SE 13",
+          "valor": "20.5048857142857",
+          "fmt": "20,5"
+        },
+        {
+          "periodo": "SE 14",
+          "valor": "20.5487",
+          "fmt": "20,5"
+        },
+        {
+          "periodo": "SE 15",
+          "valor": "19.2902571428571",
+          "fmt": "19,3"
+        },
+        {
+          "periodo": "SE 16",
+          "valor": "19.1490285714286",
+          "fmt": "19,1"
+        },
+        {
+          "periodo": "SE 17",
+          "valor": "21.8315571428571",
+          "fmt": "21,8"
+        },
+        {
+          "periodo": "SE 18",
+          "valor": "20.1936857142857",
+          "fmt": "20,2"
+        },
+        {
+          "periodo": "SE 19",
+          "valor": "18.0052857142857",
+          "fmt": "18,0"
+        },
+        {
+          "periodo": "SE 20",
+          "valor": "17.8949",
+          "fmt": "17,9"
+        },
+        {
+          "periodo": "SE 21",
+          "valor": "17.7317142857143",
+          "fmt": "17,7"
+        },
+        {
+          "periodo": "SE 22",
+          "valor": "15.7213714285714",
+          "fmt": "15,7"
+        },
+        {
+          "periodo": "SE 23",
+          "valor": "15.6467714285714",
+          "fmt": "15,6"
+        },
+        {
+          "periodo": "SE 24",
+          "valor": "15.6537714285714",
+          "fmt": "15,7"
+        },
+        {
+          "periodo": "SE 25",
+          "valor": "16.1364285714286",
+          "fmt": "16,1"
+        },
+        {
+          "periodo": "SE 26",
+          "valor": "17.1136428571429",
+          "fmt": "17,1"
+        },
+        {
+          "periodo": "SE 27",
+          "valor": "16.3788714285714",
+          "fmt": "16,4"
+        },
+        {
+          "periodo": "SE 28",
+          "valor": "13.8354285714286",
+          "fmt": "13,8"
+        },
+        {
+          "periodo": "SE 29",
+          "valor": "16.6824285714286",
+          "fmt": "16,7"
+        },
+        {
+          "periodo": "SE 30",
+          "valor": "17.7702142857143",
+          "fmt": "17,8"
+        },
+        {
+          "periodo": "SE 31",
+          "valor": "18.7356428571429",
+          "fmt": "18,7"
+        },
+        {
+          "periodo": "SE 32",
+          "valor": "19.9904857142857",
+          "fmt": "20,0"
+        },
+        {
+          "periodo": "SE 33",
+          "valor": "20.2143142857143",
+          "fmt": "20,2"
+        },
+        {
+          "periodo": "SE 34",
+          "valor": "19.1500428571429",
+          "fmt": "19,2"
+        },
+        {
+          "periodo": "SE 35",
+          "valor": "21.0371428571429",
+          "fmt": "21,0"
+        },
+        {
+          "periodo": "SE 36",
+          "valor": "17.3642714285714",
+          "fmt": "17,4"
+        },
+        {
+          "periodo": "SE 37",
+          "valor": "18.0079142857143",
+          "fmt": "18,0"
+        },
+        {
+          "periodo": "SE 38",
+          "valor": "19.2444",
+          "fmt": "19,2"
+        },
+        {
+          "periodo": "SE 39",
+          "valor": "21.8203428571429",
+          "fmt": "21,8"
+        },
+        {
+          "periodo": "SE 40",
+          "valor": "20.9377571428571",
+          "fmt": "20,9"
+        },
+        {
+          "periodo": "SE 41",
+          "valor": "20.7937571428571",
+          "fmt": "20,8"
+        },
+        {
+          "periodo": "SE 42",
+          "valor": "19.1524571428571",
+          "fmt": "19,2"
+        },
+        {
+          "periodo": "SE 43",
+          "valor": "19.5118",
+          "fmt": "19,5"
+        },
+        {
+          "periodo": "SE 44",
+          "valor": "22.5048428571429",
+          "fmt": "22,5"
+        },
+        {
+          "periodo": "SE 45",
+          "valor": "17.2419",
+          "fmt": "17,2"
+        }
+      ]
+    },
+    "atend_mes": {
+      "rotulo": "Atendimentos médicos nas UBS por mês",
+      "unidade": "atendimentos",
+      "fonte": "Arquivo enviado pela secretaria: atendimentos_ficticio.csv",
+      "url": null,
+      "origem": "arquivo",
+      "registrado_em": "2026-11-25T08:56:31-03:00",
+      "pontos": [
+        {
+          "periodo": "2026-01",
+          "valor": 4706.0,
+          "fmt": "4.706"
+        },
+        {
+          "periodo": "2026-02",
+          "valor": 4040.0,
+          "fmt": "4.040"
+        },
+        {
+          "periodo": "2026-03",
+          "valor": 4991.0,
+          "fmt": "4.991"
+        },
+        {
+          "periodo": "2026-04",
+          "valor": 5088.0,
+          "fmt": "5.088"
+        },
+        {
+          "periodo": "2026-05",
+          "valor": 4385.0,
+          "fmt": "4.385"
+        },
+        {
+          "periodo": "2026-06",
+          "valor": 5181.0,
+          "fmt": "5.181"
+        },
+        {
+          "periodo": "2026-07",
+          "valor": 5956.0,
+          "fmt": "5.956"
+        },
+        {
+          "periodo": "2026-08",
+          "valor": 4835.0,
+          "fmt": "4.835"
+        },
+        {
+          "periodo": "2026-09",
+          "valor": 4927.0,
+          "fmt": "4.927"
+        },
+        {
+          "periodo": "2026-10",
+          "valor": 4962.0,
+          "fmt": "4.962"
+        }
+      ]
+    },
+    "faltas_ubs": {
+      "rotulo": "Faltas por UBS",
+      "unidade": "faltas",
+      "fonte": "Arquivo enviado pela secretaria: atendimentos_ficticio.csv",
+      "url": null,
+      "origem": "arquivo",
+      "registrado_em": "2026-11-25T08:56:31-03:00",
+      "pontos": [
+        {
+          "periodo": "UBS Centro",
+          "valor": 1510.0,
+          "fmt": "1.510"
+        },
+        {
+          "periodo": "UBS Faisqueira",
+          "valor": 1406.0,
+          "fmt": "1.406"
+        },
+        {
+          "periodo": "UBS Jardim Yara",
+          "valor": 1202.0,
+          "fmt": "1.202"
+        },
+        {
+          "periodo": "UBS São Geraldo",
+          "valor": 1383.0,
+          "fmt": "1.383"
+        },
+        {
+          "periodo": "UBS Árvore Grande",
+          "valor": 1004.0,
+          "fmt": "1.004"
+        }
+      ]
+    },
+    "fila_esp": {
+      "rotulo": "Pessoas na fila por especialidade",
+      "unidade": "pessoas",
+      "fonte": "Arquivo enviado pela secretaria: fila_ficticia.xlsx (aba Fila)",
+      "url": null,
+      "origem": "arquivo",
+      "registrado_em": "2026-11-25T08:56:32-03:00",
+      "pontos": [
+        {
+          "periodo": "Cardiologia",
+          "valor": 30,
+          "fmt": "30"
+        },
+        {
+          "periodo": "Oftalmologia",
+          "valor": 20,
+          "fmt": "20"
+        },
+        {
+          "periodo": "Ortopedia",
+          "valor": 25,
+          "fmt": "25"
+        },
+        {
+          "periodo": "Outros (grupos com menos de 5)",
+          "valor": 3,
+          "fmt": "3"
+        }
+      ]
+    }
+  },
+  "ficticio": true
+}

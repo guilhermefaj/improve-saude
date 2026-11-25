@@ -1,6 +1,6 @@
 ---
 name: diagnostico-saude
-description: Diagnóstico de saúde pública municipal com a marca Improve Business. Use quando um gestor, secretário, coordenador ou técnico de saúde de um município contar um problema do trabalho (fila, faltas, falta de médico, dengue, orçamento, cobertura, rede de UBS, metas) e quiser entender o que os dados dizem. A skill conversa, lê os arquivos que a pessoa enviar sem expor dados pessoais, cruza com dados públicos (IBGE, Tesouro/Siconfi, CNES, InfoDengue) e entrega um PDF com insights práticos em ordem de importância. Dispare também com pedidos como "me ajuda a analisar a saúde do meu município", "tenho essa planilha de atendimentos, o que ela mostra?", "preciso de um diagnóstico para levar ao prefeito".
+description: Diagnóstico de saúde pública municipal com a marca Improve Business. Use quando um gestor, secretário, coordenador ou técnico de saúde de um município contar um problema do trabalho (fila, faltas, falta de médico, dengue, orçamento, cobertura, rede de UBS, metas) e quiser entender o que os dados dizem. A skill conversa, lê os arquivos que a pessoa enviar sem expor dados pessoais, cruza com dados públicos (IBGE, Tesouro/Siconfi, CNES, InfoDengue) e entrega um PDF com insights práticos em ordem de importância. Dispare também com pedidos como "me ajuda a analisar a saúde do meu município", "tenho essa planilha de atendimentos, o que ela mostra?", "preciso de um diagnóstico para levar ao prefeito", e quando alguém chamar a skill sem contexto ou perguntar como funciona o diagnóstico de saúde.
 ---
 
 # Diagnóstico de Saúde Pública
@@ -13,10 +13,13 @@ Três regras valem para a conversa inteira:
 2. **Nenhum dado pessoal.** Use só dados agregados por município, unidade ou mês. Nunca mostre, copie ou cite linhas de arquivo com pessoas, nem nomes de pacientes ou servidores. Leia [lgpd.md](references/lgpd.md) antes de abrir o primeiro arquivo.
 3. **Fale como colega de gestão, não como sistema.** Frases curtas, sem siglas soltas, sem jargão estatístico. Ações que a pessoa consegue fazer na segunda-feira.
 
+O documento é gerado automaticamente e de graça. A capa e a nota final já dizem isso, e que ele não é uma consultoria contratada nem foi revisado pela equipe da Improve. Não remova esse aviso e não diga, na conversa ou no texto, que a Improve analisou o caso. O convite da última página, com o contato da Improve, também faz parte do modelo: deixe `"convite": true` e não ofereça tirá-lo. Só desligue se a pessoa pedir.
+
 ## Onde ficam as coisas
 
 - Scripts: pasta `scripts/` desta skill. Rode sempre com `python "<pasta desta skill>/scripts/NOME.py"`, a partir de uma **pasta de trabalho** criada para a conversa (ex.: `diagnostico-pouso-alegre/`). Os arquivos `evidencias.json`, `documento.json`, `diagnostico.html` e `diagnostico.pdf` nascem nela.
 - Nos comandos abaixo, `scripts/` é abreviação do caminho completo da pasta de scripts desta skill. A pasta atual é sempre a de trabalho.
+- Crie a pasta e entre nela em comandos separados, e rode um script por comando. Encadear `cd` com outro comando, usar variáveis ou juntar vários scripts numa linha faz o agente pedir aprovação de novo a cada vez. Os comandos e opções estão todos aqui: não precisa abrir o `--help` de cada script.
 - Python 3.9 ou mais novo, só com a biblioteca padrão. Não instale nada.
 - Contrato dos arquivos: [contrato.md](references/contrato.md).
 - Fontes públicas, o que cada uma entrega e suas manhas: [fontes-publicas.md](references/fontes-publicas.md).
@@ -36,6 +39,30 @@ Em qualquer ambiente, se uma etapa não for possível, siga com o que der e diga
 
 ## Fluxo
 
+### 0. Conferir o ambiente
+
+```
+python scripts/ambiente.py
+```
+
+Em poucos segundos, diz se há navegador para o PDF e internet para as fontes públicas, e qual caminho é possível nesta sessão. Siga esse caminho; não insista no que o ambiente não tem.
+
+### Quando a pessoa chega sem contar nada
+
+Muita gente abre a skill sem saber o que ela faz: chama pelo nome, diz "oi", pede "um diagnóstico" sem dizer de onde ou pergunta "como funciona?". Não espere que ela adivinhe. Depois do passo 0, responda numa mensagem só, curta, com quatro partes:
+
+1. **O que você faz, numa frase.** Por exemplo: "Monto um diagnóstico da saúde do seu município: você me conta o que está pegando, eu cruzo com dados públicos e com as planilhas que você tiver e devolvo um PDF curto, com o achado mais importante em destaque e ações para começar."
+2. **Três jeitos de começar**, como frases que ela pode copiar e completar. Se souber o cargo dela, escolha frases do dia a dia desse cargo; se não, use estas:
+   - "A fila de especialidades em [município] não para de crescer."
+   - "Preciso mostrar ao prefeito para onde vai o dinheiro da saúde."
+   - "Como está a dengue aqui em comparação com o começo do ano?"
+3. **O que ajuda ter à mão**, sem exigir nada: o município e a UF e, se tiver, uma planilha (atendimentos, fila, faltas, uma exportação do TabNet). Se der para tirar as colunas de nome e CPF antes, melhor; se vierem, você não as usa.
+4. **Um atalho:** "Se preferir, me diga só o município e eu começo com um retrato a partir de dados públicos (população, gasto em saúde, rede de unidades, dengue). A gente escolhe o foco a partir dele."
+
+Diga em meia frase que o diagnóstico é automático e gratuito, e feche com uma pergunta só: "Qual é o município e o que mais está pegando aí?". Se o passo 0 mostrou que não há internet, troque o atalho por "me conte o problema e mande o que tiver" e não prometa dados públicos.
+
+Se ela escolher o atalho, rode o passo 3, mostre em quatro ou cinco linhas o que chamou atenção, cada número vindo das evidências, e pergunte qual desses pontos interessa mais, ou se a dor é outra. O retrato é conversa, não documento: o PDF vem depois que o foco estiver escolhido.
+
 ### 1. Escutar
 
 Deixe a pessoa falar. Depois, se faltar, pergunte em **uma** mensagem curta (no máximo três perguntas):
@@ -45,6 +72,9 @@ Deixe a pessoa falar. Depois, se faltar, pergunte em **uma** mensagem curta (no 
 - o que ela mais precisa resolver ou mostrar agora, e para quem (prefeito, conselho, equipe).
 
 Se ela já mandou arquivos, não pergunte o que dá para ver neles. Guarde números que ela disser ("temos 32 equipes") para registrar como relato no passo 4.
+
+- **Dor vaga** ("a saúde aqui está ruim"): não chute. Ofereça duas ou três leituras possíveis a partir do [mapa de dores](references/mapa-dores.md) ("pode ser fila, falta de médico ou orçamento; por onde começamos?") e siga pela que ela escolher.
+- **Sem arquivos:** diga logo o que dá para fazer só com dados públicos (população, gasto em saúde por área, rede de estabelecimentos, dengue) e que uma planilha dela deixaria o diagnóstico mais preciso. Não trave esperando arquivo.
 
 ### 2. Ler os arquivos enviados
 
@@ -62,7 +92,9 @@ python scripts/arquivo.py agregar ARQUIVO --id atend_mes --rotulo "Atendimentos 
 ```
 
 - `--por` com coluna de data agrupa por mês (AAAA-MM).
-- O script recusa agrupar ou filtrar por coluna pessoal e junta grupos pequenos em "Outros". Não tente contornar.
+- Tabela com um mês por coluna (Jan, Fev, Mar...): use `--colunas "Jan..Dez" --ano 2026`. O perfil sugere o comando quando vê essas colunas.
+- Linhas de total, subtotal e notas de rodapé (comuns no TabNet e no e-Gestor) são descartadas sozinhas, e o perfil mostra quais foram. Confira se nada importante saiu.
+- O script recusa agrupar ou filtrar por coluna pessoal. Ao contar registros, junta grupos com menos de 5 em "Outros" e recusa um recorte com menos de 5. Não tente contornar: no texto, diga "menos de 5".
 - Se o arquivo for um cadastro de pessoas (servidores, pacientes) sem nada agregável que responda à dor, diga isso e não use o arquivo.
 - Se a pessoa disser que um arquivo é privado ou não deve entrar na análise, não o abra nem o use.
 - PDF, imagem ou texto: leia e registre só números agregados que a pessoa confirmar, como relato (passo 4).
@@ -92,6 +124,8 @@ python scripts/evidencias.py relato --id equipes_esf --rotulo "Equipes de Saúde
 
 Operações: `pct`, `taxa`, `razao`, `diferenca`, `variacao_pct`, `variacao_pp`, `soma`. Antes de dividir, confira se os dois números cobrem o mesmo período e o mesmo recorte; se não cobrem, diga isso em `limites`.
 
+Uma taxa ou percentual sobre menos de 20 casos sai marcado como **instável** (o script avisa). Em município pequeno, um caso a mais muda tudo. Prefira o número absoluto ("3 óbitos") a uma taxa assim. Se usar a taxa, o insight precisa dizer em `limites` que a conta se apoia em poucos casos; a checagem cobra.
+
 ### 5. Escolher e ordenar os insights
 
 Liste os achados possíveis e dê nota a cada um em três critérios:
@@ -113,6 +147,8 @@ Siga o [contrato](references/contrato.md). Pontos que mais erram:
 - `confianca`: `alta` para dado oficial direto; `media` quando há arquivo do gestor ou relato no meio; `baixa` para amostra pequena ou período incerto.
 - Hipóteses ficam em `hipoteses`, nunca no `achado`.
 - Use `"ficticio": true` só em testes e demonstrações com dados inventados.
+- Em `contexto.material_recebido` e `contexto.fontes_cruzadas`, escreva cada item como "Rótulo: descrição" ("IBGE: população estimada"). A capa mostra o rótulo em negrito e a descrição embaixo. Se a pessoa não enviou nada, deixe `material_recebido` vazio: a capa escreve "Só a conversa."
+- Gráfico só quando ele mostra um contraste que o texto não mostra sozinho. Duas barras com 1 e 0, ou números todos pequenos, não pedem gráfico: deixe `grafico` de fora e o número grande fala por si.
 
 ### 7. Checar e gerar
 
@@ -123,6 +159,7 @@ python scripts/gerar_pdf.py
 ```
 
 - Se a checagem reprovar, corrija o texto (ou crie a evidência que falta) e rode de novo. Nunca use `--sem-checagem` para entregar.
+- Os arquivos saem com o nome do município: `diagnostico-pouso-alegre.html` e `.pdf`.
 - `gerar_pdf.py` usa o Chrome, o Edge ou o Chromium da própria máquina; o documento não vai para servidor nenhum. Se nenhum navegador funcionar, pule para o passo 9 com o HTML e explique: abrir no navegador e usar Imprimir > Salvar como PDF.
 
 ### 8. Revisar o layout (obrigatório)
@@ -161,7 +198,7 @@ Se algo incomodar e o problema estiver no layout, não no texto, diga isso na en
 
 ### 9. Entregar
 
-Entregue o PDF e o HTML com um resumo de três linhas: a mensagem principal, o achado 1 e o que você sugere fazer primeiro. No chat, anexe os arquivos para download; no terminal, diga o caminho completo. A pasta `previa/` é só para a revisão e não vai para a pessoa.
+Entregue o PDF (`diagnostico-<municipio>.pdf`) e o HTML com um resumo de três linhas: a mensagem principal, o achado 1 e o que você sugere fazer primeiro. No chat, anexe os arquivos para download; no terminal, diga o caminho completo. A pasta `previa/` é só para a revisão e não vai para a pessoa.
 
 ## Quando não fazer
 

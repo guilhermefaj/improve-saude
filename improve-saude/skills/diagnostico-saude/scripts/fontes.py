@@ -250,7 +250,8 @@ def cmd_arbovirose(a, ev):
         v = total / ev["itens"]["pop"]["valor"] * 100000
         feitos.append(c.item(ev, f"{d}_inc_{a.ano}", f"Casos de {d} por 100 mil habitantes em {a.ano}", v, "por 100 mil hab.",
                              "Cálculo sobre InfoDengue e IBGE", link, a.ano, "calculo", casas=1,
-                             formula=f"{d}_casos_{a.ano} / pop × 100.000", depende_de=[f"{d}_casos_{a.ano}", "pop"]))
+                             formula=f"{d}_casos_{a.ano} / pop × 100.000", depende_de=[f"{d}_casos_{a.ano}", "pop"],
+                             **c.instavel(total)))
     temps = [(f"SE {str(x['SE'])[-2:]}", x.get("tempmed")) for x in r if x.get("tempmed") is not None]
     if temps:
         c.serie(ev, f"clima_temp_{a.ano}", f"Temperatura média semanal em {a.ano}", "°C", "InfoDengue (dados climáticos)", link, "api", temps, casas=1)

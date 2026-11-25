@@ -1,6 +1,6 @@
 """Converte o HTML do diagnóstico em PDF com o navegador da própria máquina.
 
-  python gerar_pdf.py [--html diagnostico.html] [--saida diagnostico.pdf]
+  python gerar_pdf.py [--html diagnostico-<municipio>.html] [--saida diagnostico-<municipio>.pdf]
 
 Usa o Chrome, o Edge ou o Chromium instalado, em modo headless. O documento
 não sai da máquina. CHROME_PATH aponta um executável específico, se preciso.
@@ -79,9 +79,13 @@ def _imprimir(exe, html, saida):
 
 def main():
     p = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    p.add_argument("--html", default="diagnostico.html")
+    p.add_argument("--html", help="padrão: o diagnostico-*.html mais recente da pasta")
     p.add_argument("--saida")
     a = p.parse_args()
+    a.html = a.html or _comum.html_padrao()
+    if not os.path.exists(a.html):
+        print(f"Não achei o HTML ({os.path.abspath(a.html)}). Rode renderizar.py antes; se ele recusou, corrija o que a checagem apontou.")
+        sys.exit(2)
     saida = os.path.abspath(a.saida or os.path.splitext(a.html)[0] + ".pdf")
     lista = navegadores()
     erros = []

@@ -1,6 +1,6 @@
 {
   "name": "improve-saude",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Diagnóstico de saúde pública municipal: conversa com o gestor, lê os arquivos dele sem expor dados pessoais, cruza com dados públicos (IBGE, Siconfi, CNES, InfoDengue) e entrega um PDF com insights práticos, com a marca Improve Business.",
   "author": {
     "name": "Improve Business",
@@ -20,7 +20,7 @@
     "category": "Productivity",
     "capabilities": ["Diagnóstico em PDF", "Dados públicos do SUS", "Leitura de planilhas sem dados pessoais"],
     "defaultPrompt": [
-      "Quero um diagnóstico da saúde do meu município.",
+      "Como funciona o diagnóstico de saúde? Por onde eu começo?",
       "Tenho uma planilha de atendimentos. O que ela mostra?",
       "Como está a dengue aqui em comparação com o começo do ano?"
     ],

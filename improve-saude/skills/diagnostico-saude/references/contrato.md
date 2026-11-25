@@ -7,6 +7,8 @@ O documento nasce de dois arquivos na pasta de trabalho da conversa. Os dois sã
 | `evidencias.json` | **Só os scripts** (`fontes.py`, `arquivo.py`, `evidencias.py`) | Todos os números, cada um com fonte, período, link e origem |
 | `documento.json` | **O agente** | O texto: insights em ordem de importância, citando números só como `{{id}}` |
 
+Os resultados saem com o nome do município: `diagnostico-<municipio>.html` e `diagnostico-<municipio>.pdf`, mais a pasta `previa/` da revisão visual.
+
 `renderizar.py` junta os dois e gera o HTML com a marca Improve. Antes disso, `checagem.py` recusa o documento se houver um número escrito à mão, um `{{id}}` que não existe ou um insight mal formado.
 
 ## evidencias.json
@@ -40,6 +42,8 @@ O documento nasce de dois arquivos na pasta de trabalho da conversa. Os dois sã
 - `arquivo`: veio de um total calculado a partir de um arquivo do gestor.
 - `calculo`: é uma conta entre outras evidências. Nesse caso o item traz também `formula` e `depende_de`.
 - `relato`: a pessoa disse o número na conversa. Sai no documento sublinhado com pontilhado e identificado como relato da secretaria.
+
+Um item pode trazer `instavel` (texto): a taxa ou o percentual foi calculado sobre menos de 20 casos. O insight que usar esse item precisa dizer isso em `limites`, com as palavras "instável" ou "poucos casos", e a tabela final marca o número.
 
 ## documento.json
 
@@ -87,7 +91,7 @@ O documento nasce de dois arquivos na pasta de trabalho da conversa. Os dois sã
 - **Gráfico** (opcional) tem três formas:
   - `{"tipo": "serie", "serie": "atend_mes"}`: linha ao longo do tempo;
   - `{"tipo": "barras", "serie": "faltas_ubs", "realce": "UBS Centro"}`: barras a partir de uma série por categoria (unidade, especialidade). `realce` é a categoria em laranja; sem ele, a maior. De 2 a 12 categorias;
-  - `{"tipo": "barras", "itens": ["desp_ab_liq", "desp_hosp_liq"]}`: barras comparando itens da mesma unidade, de 2 a 8.
+  - `{"tipo": "barras", "itens": ["desp_ab_liq", "desp_hosp_liq"], "realce": "desp_ab_liq"}`: barras comparando itens da mesma unidade, de 2 a 8. A barra em laranja é a do `realce`; sem ele, a do `destaque` do insight, se estiver entre as barras; senão, a maior.
 - **`ficticio`** (raiz, opcional): `true` põe a marca d'água "DADOS FICTÍCIOS · TESTE". Só para testes e demonstrações.
 - **`tipo`** é um destes: `alerta`, `oportunidade`, `tendencia`, `comparacao`, `eficiencia`, `risco`.
 - **`confianca`** é `alta`, `media` ou `baixa`. Use `baixa` quando o cruzamento depender de um arquivo do gestor sem data clara ou de uma amostra pequena.
@@ -97,9 +101,14 @@ O documento nasce de dois arquivos na pasta de trabalho da conversa. Os dois sã
 
 | Campo | Limite |
 |---|---|
-| `titulo` | até 110 caracteres |
-| `mensagem_principal` | até 260 caracteres |
+| `titulo` | até 85 caracteres |
+| `subtitulo` | até 70 caracteres |
+| `mensagem_principal` | até 220 caracteres |
+| `contexto.dor` | até 120 caracteres |
 | `insights[].titulo` | até 70 caracteres |
-| `achado` e `implicacao` | até 420 caracteres cada |
+| `achado` e `implicacao` do insight 1 | até 420 caracteres cada |
+| `achado` e `implicacao` dos insights 2 e 3 (meia página) | até 240 e 290 caracteres |
 | `acoes` | até 3 itens por insight |
 | `hipoteses`, `perguntas`, `proximos_passos` | até 4 itens cada |
+
+A checagem cobra esses limites antes de gerar o PDF. Eles valem para o caso comum; a capa e a página dos achados 2 e 3 ainda podem estourar se tudo vier no limite, e a revisão de layout diz quantos milímetros sobram.

@@ -1,6 +1,6 @@
 """Revisa espaçamento, quebras de linha e paginação do diagnóstico antes da entrega.
 
-  python revisar_layout.py [--html diagnostico.html] [--pdf diagnostico.pdf]
+  python revisar_layout.py [--html diagnostico-<municipio>.html] [--pdf diagnostico-<municipio>.pdf]
 
 Abre o HTML no navegador da máquina (sem interface), na largura útil da página
 A4, mede cada bloco e aponta:
@@ -8,7 +8,7 @@ A4, mede cada bloco e aponta:
   PROBLEMAS (impedem a entrega)
     - seção que não cabe no número de páginas previsto (capa, achado principal,
       achados 2 e 3, fechamento: uma página cada);
-    - palavra sozinha na última linha de um título ou parágrafo;
+    - palavra sozinha na primeira ou na última linha de um título, parágrafo ou item;
     - título que quebra em linhas demais;
     - texto ou bloco que passa da margem;
     - rótulo de gráfico cortado pela borda ou sobreposto a outro;
@@ -82,7 +82,12 @@ MEDIDOR = r"""
       if (l) l.n.push(w.p); else linhas.push({ y: w.y, n: [w.p] });
     }
     linhas.sort((a, b) => a.y - b.y);
-    const ult = linhas[linhas.length - 1].n;
+    const ult = linhas[linhas.length - 1].n, pri = linhas[0].n;
+    if (el.querySelector("br")) continue;   // quebra de linha de propósito (rótulo e período, cálculo e fórmula)
+    // em célula de tabela a coluna é estreita e "2025 (população 2026)" quebra naturalmente
+    if (linhas.length >= 2 && pri.length === 1 && pri[0].length < 12 && !el.querySelector(".rot") && el.tagName !== "TD")
+      saida.problemas.push({ tipo: "palavra sozinha", onde: onde(el), detalhe: `a primeira linha tem só "${pri[0]}"`,
+        corrigir: "reescreva o item; em listas de fontes use o formato 'Rótulo: descrição'" });
     if (linhas.length >= 2 && ult.length === 1 && ult[0].length < 25)
       saida.problemas.push({ tipo: "palavra sozinha", onde: onde(el), detalhe: `a última linha tem só "${ult[0]}"`,
         corrigir: "reescreva a frase com algumas palavras a mais ou a menos" });
@@ -161,7 +166,7 @@ def avaliar(m, pdf=None):
         if not f["ok"]:
             avisos.append({"tipo": "fonte", "onde": f["fonte"], "detalhe": "não carregou; o layout medido usou a fonte reserva",
                            "corrigir": "confira a internet da máquina e gere de novo"})
-    previstas = 0
+    previstas = folga = 0
     for s in m["secoes"]:
         uso = s["altura_mm"] / ALTURA_MM
         if s["limite"]:
@@ -183,10 +188,12 @@ def avaliar(m, pdf=None):
                                "corrigir": "aceitável se o achado é curto; se parecer vazio, acrescente uma ação ou um limite"})
         else:
             previstas += max(1, math.ceil(uso - 0.01))
+            # tabela longa: a medida na tela passa um pouco da conta do PDF, que reparte as linhas entre páginas
+            folga += max(1, math.ceil(uso - 0.01)) - max(1, math.ceil(uso - 0.1))
     total = None
     if pdf and os.path.exists(pdf):
         total = paginas_pdf(pdf)
-        if total and total != previstas:
+        if total and not (previstas - folga <= total <= previstas):
             problemas.append({"tipo": "quebra inesperada", "onde": os.path.basename(pdf),
                               "detalhe": f"o PDF tem {total} páginas; o previsto era {previstas}",
                               "corrigir": "algum bloco foi empurrado para outra página: veja os itens de página estourada"})
@@ -195,10 +202,11 @@ def avaliar(m, pdf=None):
 
 def main():
     p = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    p.add_argument("--html", default="diagnostico.html")
+    p.add_argument("--html", help="padrão: o diagnostico-*.html mais recente da pasta")
     p.add_argument("--pdf", help="padrão: o .pdf ao lado do HTML, se existir")
     p.add_argument("--json", action="store_true", help="imprime a medição completa em JSON")
     a = p.parse_args()
+    a.html = a.html or _comum.html_padrao()
     pdf = a.pdf or os.path.splitext(a.html)[0] + ".pdf"
     try:
         m = medir(a.html)

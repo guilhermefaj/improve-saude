@@ -76,8 +76,18 @@ def cmd_calcular(a, ev):
     fmt = None
     if unidade == "p.p.":
         fmt = c.fmt_num(r, 1 if a.casas is None else a.casas) + " p.p."
+    # Taxa ou percentual sobre poucos casos engana: marca como instável.
+    contagem = lambda v: v["unidade"] not in ("%", "R$", "p.p.") and not str(v["unidade"]).startswith("por ")
+    extra = {}
+    if op in ("pct", "taxa", "razao") and contagem(vals[0]):
+        extra = c.instavel(x[0])
+    elif op in ("variacao_pct",) and contagem(vals[1]):
+        extra = c.instavel(min(x[0], x[1]))
+    herdado = next((v["instavel"] for v in vals if v.get("instavel")), None)
+    if herdado and not extra:
+        extra = {"instavel": "depende de um número instável (" + herdado + ")"}
     reg = c.item(ev, a.id, a.rotulo, r, unidade, "Cálculo sobre: " + "; ".join(fontes), None,
-                 " e ".join(periodos) or None, "calculo", casas=a.casas, fmt=fmt, formula=f, depende_de=ids)
+                 " e ".join(periodos) or None, "calculo", casas=a.casas, fmt=fmt, formula=f, depende_de=ids, **extra)
     print(c.resumo(reg) + f" | fórmula: {f}")
 
 

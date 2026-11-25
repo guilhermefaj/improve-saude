@@ -1,0 +1,77 @@
+{
+  "ficticio": true,
+  "titulo": "As faltas nas UBS custam mais do que a fila de especialidades mostra",
+  "subtitulo": "Diagnóstico a partir da conversa com a coordenação da atenção básica",
+  "para": {"cargo": "Coordenação de Atenção Básica", "orgao": "Secretaria Municipal de Saúde"},
+  "mensagem_principal": "Uma em cada oito consultas agendadas nas UBS terminou em falta ({{faltas_pct}}). Reduzir esse número libera agenda sem contratar ninguém, e a atenção básica hoje recebe só {{ab_part_pct}} do gasto em saúde.",
+  "contexto": {
+    "dor": "Fila crescente para especialidades e UBS sempre cheias, mas com muitos pacientes que não comparecem.",
+    "material_recebido": ["Planilha de atendimentos e faltas por UBS, jan a out 2026", "Planilha da fila de especialidades"],
+    "fontes_cruzadas": ["IBGE: população estimada", "Tesouro (Siconfi): despesa em saúde por área", "CNES: rede de estabelecimentos", "InfoDengue: casos e alerta de dengue"]
+  },
+  "insights": [
+    {
+      "prioridade": 1,
+      "tipo": "alerta",
+      "titulo": "Uma em cada oito consultas agendadas vira falta",
+      "destaque": "faltas_pct",
+      "achado": "De janeiro a outubro, as cinco UBS da planilha registraram {{faltas_ubs_total}} faltas para {{atend_mes_total}} atendimentos médicos. A UBS Centro concentra o maior volume. Com as {{equipes_esf_relato}} equipes informadas, são cerca de {{faltas_por_equipe}} faltas por equipe no período.",
+      "cruzamento": "Faltas e atendimentos do arquivo enviado, cruzados com o número de equipes informado na conversa.",
+      "implicacao": "Cada falta é um horário que poderia ter atendido alguém da fila. Antes de pedir mais profissionais, vale recuperar essa agenda: o ganho aparece rápido e não depende de orçamento novo.",
+      "acoes": ["Confirmar consultas por mensagem dois dias antes, começando pela UBS Centro", "Liberar os horários de quem não confirmou para encaixes do dia", "Acompanhar a taxa de faltas por UBS todo mês"],
+      "grafico": {"tipo": "barras", "serie": "faltas_ubs", "realce": "UBS Centro"},
+      "evidencias": ["faltas_ubs_total", "atend_mes_total", "equipes_esf_relato"],
+      "confianca": "media",
+      "limites": "A planilha cobre cinco UBS. O número de equipes veio da conversa e não foi conferido no CNES."
+    },
+    {
+      "prioridade": 2,
+      "tipo": "eficiencia",
+      "titulo": "A atenção básica fica com uma fatia pequena do gasto",
+      "destaque": "ab_part_pct",
+      "achado": "Em 2025, o município liquidou {{desp_saude_liq}} em saúde. A atenção básica recebeu {{desp_ab_liq}}, contra {{desp_hosp_liq}} da assistência hospitalar e ambulatorial e {{desp_adm_liq}} da administração.",
+      "cruzamento": "Despesas por área do Tesouro Nacional (Siconfi), sem relação com os arquivos enviados.",
+      "implicacao": "Com pouco recurso na porta de entrada, a fila de especialidades tende a crescer. O dado ajuda a defender investimento em atenção básica junto ao gabinete e ao conselho de saúde.",
+      "acoes": ["Levar a comparação por área para a próxima reunião do conselho municipal de saúde"],
+      "grafico": {"tipo": "barras", "itens": ["desp_hosp_liq", "desp_adm_liq", "desp_ab_liq", "desp_vigepi_liq", "desp_vigsan_liq", "desp_farm_liq"]},
+      "evidencias": ["desp_saude_liq"],
+      "confianca": "alta"
+    },
+    {
+      "prioridade": 3,
+      "tipo": "tendencia",
+      "titulo": "A procura pelas UBS ficou estável ao longo do ano",
+      "destaque": "atend_por_hab",
+      "achado": "Os atendimentos médicos variaram pouco de um mês para o outro, com o maior volume em julho. No ano, são {{atend_por_hab}} atendimentos por mil habitantes.",
+      "cruzamento": "Atendimentos do arquivo enviado divididos pela população estimada do IBGE.",
+      "implicacao": "Sem pico sazonal forte, o problema das faltas não é de excesso de demanda em um mês específico. É uma perda constante de agenda.",
+      "grafico": {"tipo": "serie", "serie": "atend_mes"},
+      "evidencias": ["pop"],
+      "confianca": "media"
+    },
+    {
+      "prioridade": 4,
+      "tipo": "comparacao",
+      "titulo": "Cada UBS ou posto atende, em média, milhares de moradores",
+      "destaque": "hab_por_ubs",
+      "achado": "O CNES lista {{cnes_tipo_02}} UBS e {{cnes_tipo_01}} postos de saúde para {{pop}} habitantes.",
+      "cruzamento": "Rede do CNES dividida pela população do IBGE.",
+      "implicacao": "Ajuda a decidir onde reforçar a confirmação de consultas primeiro.",
+      "confianca": "alta"
+    },
+    {
+      "prioridade": 5,
+      "tipo": "oportunidade",
+      "titulo": "A dengue está sob controle neste momento",
+      "destaque": "dengue_nivel_atual",
+      "achado": "Foram {{dengue_casos_2026}} casos notificados em 2026, com pico na primeira semana do ano e alerta atual em {{dengue_nivel_atual}}.",
+      "cruzamento": "Casos e nível de alerta do InfoDengue.",
+      "implicacao": "É uma janela para as equipes focarem na agenda das UBS antes do próximo verão.",
+      "confianca": "alta"
+    }
+  ],
+  "hipoteses": ["As faltas podem ser maiores em consultas marcadas com muita antecedência", "A UBS Centro pode concentrar pacientes de outros bairros, que faltam mais"],
+  "perguntas": ["Quanto tempo, em média, passa entre o agendamento e a consulta?", "Existe hoje algum lembrete de consulta, por telefone ou mensagem?"],
+  "proximos_passos": ["Separar as faltas por tempo de espera do agendamento", "Testar a confirmação ativa por dois meses na UBS Centro e comparar"],
+  "convite": true
+}

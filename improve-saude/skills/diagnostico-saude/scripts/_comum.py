@@ -22,8 +22,18 @@ try:  # Windows usa cp1252 no console; sem isso os acentos quebram
 except Exception:
     pass
 
-USER_AGENT = "improve-saude/0.1 (+https://improve.business)"
+VERSAO = "0.3.0"  # versão do plugin; aparece na nota final do PDF
+USER_AGENT = f"improve-saude/{VERSAO} (+https://improve.business)"
 VERSAO_EVIDENCIAS = 1
+MINIMO_ESTAVEL = 20  # abaixo disso, uma taxa muda muito com um caso a mais ou a menos
+
+
+def instavel(n):
+    """Extra para c.item quando a conta se apoia em poucos casos."""
+    if n is None or n >= MINIMO_ESTAVEL:
+        return {}
+    return {"instavel": f"calculado sobre {fmt_num(n)} caso{'' if n == 1 else 's'}; com menos de {MINIMO_ESTAVEL}, "
+                        "um caso a mais ou a menos muda muito o resultado"}
 
 
 # --------------------------------------------------------------------- rede
@@ -165,4 +175,26 @@ def serie(ev, id_, rotulo, unidade, fonte, url, origem, pontos, casas=None, **ex
 
 def resumo(registrado):
     """Linha curta para o agente ler no terminal, sem despejar JSON."""
-    return f"{registrado['rotulo']}: {registrado['fmt']} ({registrado.get('periodo') or 's/d'}; {registrado['fonte']})"
+    linha = f"{registrado['rotulo']}: {registrado['fmt']} ({registrado.get('periodo') or 's/d'}; {registrado['fonte']})"
+    if registrado.get("instavel"):
+        linha += f"\n  ATENÇÃO, número instável: {registrado['instavel']}. Se usar, diga isso em 'limites'."
+    return linha
+
+
+# ------------------------------------------------------------------- arquivos
+def norm(texto):
+    """Minúsculas sem acento, para comparar textos."""
+    import unicodedata
+    return unicodedata.normalize("NFKD", str(texto)).encode("ascii", "ignore").decode().lower()
+
+
+def slug(texto):
+    s = norm(texto)
+    return "-".join(p for p in "".join(ch if ch.isalnum() else " " for ch in s).split()) or "municipio"
+
+
+def html_padrao():
+    """O diagnóstico mais recente da pasta de trabalho (diagnostico-<municipio>.html)."""
+    achados = sorted((f for f in os.listdir(".") if f.startswith("diagnostico") and f.endswith(".html")),
+                     key=os.path.getmtime, reverse=True)
+    return achados[0] if achados else "diagnostico.html"

@@ -30,6 +30,16 @@ Use quando a dor pedir e a pessoa aceitar uma análise menos direta. Por enquant
 | TabNet | Responde, mas cai com consultas automáticas | Montar a tabela no site e enviar o CSV |
 | Microdados (vacina, SIM, SINASC, notificações) | Registros individuais, sem filtro por município | Fora do escopo da conversa |
 
+## Como pedir a planilha certa
+
+Quando a dor pede um dado sem acesso automático, diga à pessoa exatamente o que baixar. Os caminhos abaixo são os de costume; se a tela estiver diferente, peça que ela descreva o que vê.
+
+- **TabNet (DATASUS)**, para produção ambulatorial (SIA), internações (SIH), nascidos vivos e óbitos: em tabnet.datasus.gov.br, escolha o tema e a abrangência, marque o município em "Seleções disponíveis", escolha "Município" ou "Estabelecimento" na linha e "Mês" ou "Ano" na coluna, e use "Copia como .CSV" depois de mostrar a tabela.
+- **SISAB**, para produção e indicadores da atenção básica: em sisab.saude.gov.br, abra os relatórios públicos, filtre pelo município e pelo período e exporte em planilha.
+- **Cobertura vacinal**: no painel de vacinação do Ministério da Saúde (InfoMS), filtre o município e exporte a tabela.
+
+`arquivo.py` já descarta as linhas de total e as notas de rodapé dessas exportações e aceita tabelas com um mês por coluna (`--colunas`). Cite o sistema de origem como fonte no documento.
+
 ## Rede bloqueada
 
 `fontes.py` avisa com uma mensagem clara quando não alcança a fonte. O que fazer depende do ambiente:

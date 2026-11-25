@@ -9,6 +9,8 @@ Plugin para quem trabalha na gestão da saúde de um município. Funciona no Cla
 
 Todo número do documento vem de uma fonte identificada. Uma checagem automática recusa o documento se aparecer um número que não saiu dos dados.
 
+O diagnóstico é gerado automaticamente e de graça, a partir de uma conversa curta. O próprio documento avisa isso: ele não é uma consultoria contratada nem passa pela revisão da equipe da Improve. Para aprofundar, fale com a gente pelos contatos no fim desta página.
+
 ## Onde funciona melhor
 
 | Onde | Dados públicos | PDF |
@@ -50,14 +52,14 @@ network_access = true
 
 ### Claude.ai (navegador)
 
-1. Baixe este repositório e compacte a pasta `improve-saude/skills/diagnostico-saude` em um `.zip`.
+1. Baixe [diagnostico-saude.zip](https://github.com/guilhermefaj/improve-saude/releases/latest/download/diagnostico-saude.zip), a skill pronta.
 2. Em Configurações > Capacidades, ative a execução de código e envie o `.zip` em Skills.
 
 ### ChatGPT
 
 Skills existem nos planos Business, Enterprise, Edu e Healthcare, e o administrador do workspace precisa ativar o envio.
 
-1. Compacte a pasta `improve-saude/skills/diagnostico-saude` em um `.zip`, como no Claude.ai.
+1. Baixe [diagnostico-saude.zip](https://github.com/guilhermefaj/improve-saude/releases/latest/download/diagnostico-saude.zip), o mesmo do Claude.ai.
 2. No ChatGPT, abra **Skills**, escolha **Create** > **Upload from your computer** e envie o `.zip`.
 
 No Claude.ai e no ChatGPT, o ambiente que roda os scripts costuma bloquear os sites do governo e não tem navegador para montar o PDF. A skill funciona, mas só com os arquivos que você enviar e com o que você contar; o documento avisa isso. Para cruzar com os dados públicos e receber o PDF pronto, use o Claude Code, o Cowork ou o Codex.
@@ -70,18 +72,30 @@ Comece contando o problema. Exemplos:
 - "Preciso mostrar ao conselho de saúde para onde vai o dinheiro da saúde do município."
 - "Como está a dengue aqui em comparação com o começo do ano?"
 
-O assistente pergunta só o que faltar (município, seu cargo, para quem é o documento) e devolve `diagnostico.pdf` e `diagnostico.html` na pasta de trabalho.
+Não sabe por onde começar? Chame a skill sem dizer nada (`/improve-saude:diagnostico-saude` no Claude Code) ou pergunte "como funciona?". Ela se apresenta, sugere três jeitos de começar e aceita só o nome do município: nesse caso, traz um retrato com dados públicos para você escolher o foco.
+
+O assistente pergunta só o que faltar (município, seu cargo, para quem é o documento) e devolve `diagnostico-<municipio>.pdf` e `.html` na pasta de trabalho.
 
 ## O que precisa ter na máquina
 
 - **Python 3.9 ou mais novo.** Os scripts usam só a biblioteca padrão; não há nada para instalar.
 - **Chrome, Edge ou Chromium** para gerar o PDF, na sua própria máquina: o documento não é enviado a nenhum servidor. Sem navegador, o HTML sai pronto e você salva como PDF pela impressão.
 
+## Se algo não funcionar
+
+Rode o autoteste, que gera um diagnóstico de exemplo com dados fictícios e diz em qual etapa está o problema:
+
+```
+python improve-saude/skills/diagnostico-saude/scripts/autoteste.py
+```
+
+Mande o resultado para [contato@improve.business](mailto:contato@improve.business).
+
 ## Privacidade
 
 - Só dados agregados por município, unidade ou mês. Nenhum dado de paciente ou de servidor entra no documento.
 - Colunas com CPF, CNS, nome de pessoa, nascimento, endereço, telefone ou e-mail são detectadas e nunca têm valores exibidos, nem usadas para agrupar.
-- Grupos com menos de 5 pessoas viram "Outros".
+- Grupos com menos de 5 pessoas ou casos viram "Outros", mesmo em arquivos sem CPF ou nome.
 - Os arquivos ficam na sua máquina (Claude Code, Cowork e Codex) ou na sua conversa (Claude.ai e ChatGPT). As consultas às fontes públicas mandam só o código do município.
 
 Detalhes em [lgpd.md](improve-saude/skills/diagnostico-saude/references/lgpd.md).
@@ -99,7 +113,7 @@ improve-saude/
     agents/openai.yaml                 nome e descrição da skill no Codex
     references/                        contrato dos arquivos, fontes, mapa de dores, LGPD
     scripts/                           coleta, leitura de arquivos, checagem, HTML e PDF
-    assets/logo-improve.png
+    assets/                            logo da Improve e o exemplo fictício do autoteste
 ```
 
 ## Fontes

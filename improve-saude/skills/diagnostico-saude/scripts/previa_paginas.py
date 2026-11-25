@@ -1,6 +1,6 @@
 """Gera uma imagem PNG de cada página do diagnóstico, para a revisão visual.
 
-  python previa_paginas.py [--html diagnostico.html] [--pasta previa]
+  python previa_paginas.py [--html diagnostico-<municipio>.html] [--pasta previa]
 
 Serve para qualquer agente que consiga abrir imagens, mesmo sem ler PDF.
 Usa o mesmo navegador do gerar_pdf.py e não envia nada para fora da máquina.
@@ -106,9 +106,10 @@ def gerar_previa(html, pasta_saida):
 
 def main():
     p = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    p.add_argument("--html", default="diagnostico.html")
+    p.add_argument("--html", help="padrão: o diagnostico-*.html mais recente da pasta")
     p.add_argument("--pasta", default="previa")
     a = p.parse_args()
+    a.html = a.html or _comum.html_padrao()
     try:
         feitas = gerar_previa(a.html, a.pasta)
     except Exception as e:  # noqa: BLE001
