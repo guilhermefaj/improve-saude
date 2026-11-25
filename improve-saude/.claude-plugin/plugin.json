@@ -4,8 +4,11 @@
   "description": "Diagnóstico de saúde pública municipal: conversa com o gestor, lê os arquivos dele sem expor dados pessoais, cruza com dados públicos (IBGE, Siconfi, CNES, InfoDengue) e entrega um PDF com insights práticos, com a marca Improve Business.",
   "author": {
     "name": "Improve Business",
-    "url": "https://improvebusiness.ai"
+    "url": "https://improve.business",
+    "email": "contato@improve.business"
   },
-  "homepage": "https://improvebusiness.ai",
+  "homepage": "https://improve.business",
+  "repository": "https://github.com/guilhermefaj/improve-saude",
+  "license": "MIT",
   "keywords": ["saúde pública", "SUS", "município", "gestão", "diagnóstico", "dados abertos"]
 }

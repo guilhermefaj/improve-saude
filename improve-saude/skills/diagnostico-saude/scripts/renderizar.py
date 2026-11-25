@@ -32,7 +32,8 @@ TIPO = {"alerta": ("Alerta", C["vermelho"]), "risco": ("Risco", C["vermelho"]), 
         "tendencia": ("Tendência", C["roxo"]), "comparacao": ("Comparação", C["roxo"]), "eficiencia": ("Eficiência", C["laranja"])}
 CONFIANCA = {"alta": "Confiança alta", "media": "Confiança média", "baixa": "Confiança baixa"}
 ORIGEM = {"api": "Dado público", "arquivo": "Arquivo da secretaria", "calculo": "Cálculo", "relato": "Relato da secretaria"}
-CONTATO = "improvebusiness.ai"  # TODO(Guilherme): confirmar o canal de contato que vai no convite
+SITE = "https://improve.business"
+EMAIL = "contato@improve.business"
 MESES = ["janeiro", "fevereiro", "março", "abril", "maio", "junho", "julho", "agosto", "setembro", "outubro", "novembro", "dezembro"]
 
 esc = lambda s: html.escape(str(s if s is not None else ""), quote=True)
@@ -479,6 +480,7 @@ h3.mais { font-size: 13pt; margin: 0 0 3mm; }
 .nota-hip { font-size: 8.5pt; color: __apoio__; margin: 0 0 2mm; }
 .convite { background: __roxo__; color: #fff; border-radius: 3mm; padding: 6mm 7mm; margin: 8mm 0; break-inside: avoid; }
 .convite h3 { margin: 0 0 1.5mm; font-size: 16pt; color: #fff; } .convite p { margin: 0; }
+.convite a { color: #fff; font-weight: 600; text-decoration: underline; text-decoration-color: __laranja__; text-underline-offset: 2px; }
 /* rastro */
 table.rastro { width: 100%; border-collapse: collapse; font-size: 8pt; table-layout: fixed; }
 table.rastro th { text-align: left; color: __apoio__; font-weight: 600; border-bottom: 1.5px solid __laranja__; padding: 1.5mm 1.5mm; }
@@ -535,7 +537,7 @@ def render(doc, ev):
     prox = doc.get("proximos_passos") or []
     convite = (f'<div class="convite"><h3>Quer aprofundar este diagnóstico?</h3>'
                f'<p>A Improve Business ajuda secretarias de saúde a transformar dados em decisões e resultados. '
-               f'Fale com a gente: {esc(CONTATO)}</p></div>') if doc.get("convite", True) else ""
+               f'Fale com a gente: <a href="mailto:{EMAIL}">{EMAIL}</a> · <a href="{SITE}">improve.business</a></p></div>') if doc.get("convite", True) else ""
     titulo_fim = ("Outros sinais, hipóteses e próximos passos" if comp else "Hipóteses, perguntas e próximos passos")
     paginas.append(f"""<section class="pagina" data-nome="Fechamento" data-paginas="1">{marca}{topo(municipio, titulo_fim, logo)}
   {comp}
@@ -550,7 +552,7 @@ def render(doc, ev):
   <table class="rastro"><colgroup><col style="width:30%"><col style="width:14%"><col style="width:14%"><col style="width:24%"><col style="width:18%"></colgroup><thead><tr><th>Indicador</th><th>Valor</th><th>Período</th><th>Fonte</th><th>Origem</th></tr></thead>
   <tbody>{rastro(doc, ev)}</tbody></table>
   <div class="metodo"><p><strong>Como este documento foi feito.</strong> Ele foi produzido com a skill Diagnóstico de Saúde Pública,
-  da Improve Business, a partir de dados públicos agregados por município e do material que a secretaria compartilhou na conversa.
+  da <a href="{SITE}">Improve Business</a>, a partir de dados públicos agregados por município e do material que a secretaria compartilhou na conversa.
   Nenhum dado pessoal foi usado ou citado. Os textos foram redigidos com apoio de inteligência artificial. Todos os números saíram
   das fontes acima e passaram por uma checagem automática antes da geração. Números sublinhados com pontilhado foram informados pela
   secretaria e não foram conferidos em fonte oficial.</p><p>Gerado em {esc(data_extenso())}.</p></div>

@@ -22,7 +22,7 @@ try:  # Windows usa cp1252 no console; sem isso os acentos quebram
 except Exception:
     pass
 
-USER_AGENT = "improve-saude/0.1 (+https://improvebusiness.ai)"
+USER_AGENT = "improve-saude/0.1 (+https://improve.business)"
 VERSAO_EVIDENCIAS = 1
 
 

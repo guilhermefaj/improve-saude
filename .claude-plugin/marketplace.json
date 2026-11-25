@@ -1,7 +1,8 @@
 {
   "name": "improve-gestao-publica",
   "owner": {
-    "name": "Improve Business"
+    "name": "Improve Business",
+    "email": "contato@improve.business"
   },
   "metadata": {
     "description": "Plugins da Improve Business para gestão pública."

@@ -70,4 +70,6 @@ improve-saude/
 
 Os títulos usam a fonte Clash Display, carregada da Fontshare quando o documento é aberto, e o texto usa Inter (licença OFL), do Google Fonts. Sem internet, o documento cai para Arial.
 
-Feito pela [Improve Business](https://improvebusiness.ai).
+Feito pela [Improve Business](https://improve.business). Fale com a gente: [contato@improve.business](mailto:contato@improve.business).
+
+Código sob a [licença MIT](LICENSE). A marca e o logo da Improve Business não fazem parte da licença.
