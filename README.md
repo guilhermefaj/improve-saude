@@ -43,7 +43,7 @@ flowchart LR
   class E fim
 ```
 
-- **Cada número tem origem.** Os valores saem de scripts que consultam as fontes ou leem seus arquivos, e o texto só cita esses valores. A última página do PDF diz de onde veio cada um.
+- **Cada número tem origem.** Os valores saem de scripts que consultam as fontes ou leem seus arquivos, e o texto só cita esses valores. As últimas páginas do PDF dizem de onde veio cada um.
 - **Número inventado não passa.** Uma checagem automática recusa o documento se aparecer um valor que não saiu dos dados.
 - **O mais importante ganha espaço.** O achado principal ocupa uma página inteira, com gráfico e ações. Os dois seguintes ganham meia página cada, e os demais entram numa lista.
 - **Privacidade por padrão.** O documento usa só totais por município, unidade ou mês. CPF, nome e telefone são detectados e nunca aparecem.
@@ -140,10 +140,12 @@ Não sabe o que pedir? Chame a skill sem dizer nada ou pergunte "como funciona?"
 | Situação | Comece com | O documento traz |
 |---|---|---|
 | Fila crescendo | "A fila de especialidades em Pouso Alegre (MG) não para de crescer. Segue a planilha de atendimentos." | Onde a agenda se perde, por unidade, e o que fazer primeiro |
-| Prestar contas | "Preciso mostrar ao prefeito para onde vai o dinheiro da saúde." | O gasto por área, do Tesouro (Siconfi), e o que ele indica |
+| Prestar contas | "Preciso mostrar ao prefeito para onde vai o dinheiro da saúde." | O gasto por área e quanto o município, a União e o Estado financiam, do Tesouro (Siconfi) |
 | Recurso federal | "Estamos perdendo dinheiro da atenção primária?" | Descontos no repasse da APS, classificação das equipes e cobertura |
+| Metas da atenção primária | "Quantas mulheres deveriam fazer o preventivo e a mamografia aqui?" | O público-alvo por idade e sexo do Ministério da Saúde e a cobertura das equipes |
 | Falta de leito | "Os pedidos de internação estão demorando demais." | Leitos SUS e de UTI por morador que depende só do SUS e o peso dos filantrópicos |
 | Vigilância | "Como está a dengue aqui em comparação com o começo do ano?" | Casos e nível de alerta do InfoDengue ao longo das semanas |
+| Água e saneamento | "A água daqui é segura? Temos muita diarreia." | Análises da vigilância com coliformes e E. coli, saneamento do Censo e internações por diarreia |
 | Só um retrato | "Serra da Saudade, MG." | Um retrato curto com dados públicos, para você escolher o foco |
 
 O assistente pergunta só o que faltar: o município, o seu cargo e para quem é o documento.
