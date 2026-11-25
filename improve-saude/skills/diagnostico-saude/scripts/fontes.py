@@ -10,6 +10,10 @@ Uso (sempre a partir da pasta de trabalho da conversa):
   python fontes.py siops --ano 2025
   python fontes.py repasses --ano 2025
   python fontes.py contexto
+  python fontes.py leitos
+  python fontes.py planos
+  python fontes.py agua --ano 2025
+  python fontes.py financiamento --ano 2025
 
 Cada comando imprime um resumo curto. Nada é inventado: se a fonte não
 responder, o comando falha e diz isso. Só contagens e totais são gravados;
@@ -168,7 +172,7 @@ def cmd_financas(a, ev):
         print(f"Aviso: DCA de {a.ano} e {a.ano - 1} não encontrada no Siconfi.")
 
     # 3) e 4) Pessoal (RGF) e receita corrente líquida (RREO Anexo 03). Se falharem, o resto vale.
-    for parte in (_rgf_pessoal, _rreo_rcl):
+    for parte in (_rgf_pessoal, _rreo_rcl, _rreo_rp):
         try:
             feitos += parte(ev, m, a.ano)
         except c.SemRede as e:
@@ -213,6 +217,44 @@ def _rgf_pessoal(ev, m, ano):
                 return feitos
     print(f"Aviso: RGF de {ano} e {ano - 1} não encontrado no Siconfi.")
     return []
+
+
+def _rreo_rp(ev, m, ano):
+    """Restos a pagar (RREO Anexo 14)"""
+    # O bloco de restos a pagar do Anexo 14 (demonstrativo simplificado do RREO) é do município inteiro, por poder;
+    # não separa a saúde. Por isso os rótulos dizem "todas as áreas".
+    for bim in range(6, 0, -1):
+        for tipo in ("RREO", "RREO Simplificado"):
+            params = {"an_exercicio": ano, "nr_periodo": bim, "co_tipo_demonstrativo": tipo,
+                      "no_anexo": "RREO-Anexo 14", "id_ente": m["ibge"]}
+            linhas = {(l["cod_conta"], l["coluna"].split(" ")[0]): float(l["valor"])
+                      for l in c.get_json(f"{SICONFI}/rreo", params).get("items", [])
+                      if l["cod_conta"] in ("TotalRestosAPagarDemonstrativoSimplificado", "RestosAPagarNaoProcessadosDemonstrativoSimplificado")}
+            if linhas:
+                break
+        if linhas:
+            break
+    else:
+        print(f"Aviso: o RREO de {ano} ainda não traz os restos a pagar.")
+        return []
+    url = f"{SICONFI}/rreo?" + urllib.parse.urlencode(params)
+    periodo = f"{ano} (até o {bim}º bimestre)"
+    fonte = f"Siconfi/Tesouro Nacional, {tipo} Anexo 14"
+    tot, np_ = "TotalRestosAPagarDemonstrativoSimplificado", "RestosAPagarNaoProcessadosDemonstrativoSimplificado"
+    feitos = []
+    for chave, id_, rot in (((tot, "Inscrição"), "rp_inscritos", "Restos a pagar de anos anteriores, todas as áreas"),
+                            ((tot, "Pagamento"), "rp_pagos", "Restos a pagar pagos no ano, todas as áreas"),
+                            ((tot, "Cancelamento"), "rp_cancelados", "Restos a pagar cancelados no ano, todas as áreas"),
+                            ((tot, "Saldo"), "rp_saldo", "Restos a pagar ainda a pagar, todas as áreas"),
+                            ((np_, "Cancelamento"), "rp_np_cancelados", "Restos a pagar não processados cancelados no ano, todas as áreas")):
+        if chave in linhas:
+            feitos.append(c.item(ev, id_, rot, linhas[chave], "R$", fonte, url, periodo, "api"))
+    if linhas.get((tot, "Inscrição")):
+        feitos.append(c.item(ev, "rp_cancelados_pct", "Parcela dos restos a pagar cancelada no ano, todas as áreas",
+                             linhas.get((tot, "Cancelamento"), 0) / linhas[(tot, "Inscrição")] * 100, "%",
+                             "Cálculo sobre Siconfi (RREO Anexo 14)", url, periodo, "calculo",
+                             formula="rp_cancelados / rp_inscritos × 100", depende_de=["rp_cancelados", "rp_inscritos"]))
+    return feitos
 
 
 _RREO3 = {
@@ -654,7 +696,341 @@ def _cidades(ev, m):
 
 
 def cmd_contexto(a, ev):
-    _partes([_censo, _cidades], ev, _municipio(ev))
+    _partes([_censo, _cidades, _svsa, _pib], ev, _municipio(ev))
+
+
+# ------------------------------------------------------------- leitos do CNES
+LEITOS = f"{MS}/assistencia-a-saude/cnes-leitos"
+_MAX_LEITOS = 6000  # linhas (estabelecimento × tipo de leito); a capital paulista é a maior
+_TIPO_LEITO = {"1": "Cirúrgicos", "2": "Clínicos", "3": "Complementares (UTI e UCI)", "4": "Obstétricos",
+               "5": "Pediátricos", "6": "Outras especialidades", "7": "Hospital-dia"}
+
+
+def cmd_leitos(a, ev):
+    """Atenção: esta API devolve UMA linha por chamada, seja qual for o `limit`, e o
+    `offset` é o número da linha (testado em 25/11/2026). Por isso a busca é linha a linha, em paralelo."""
+    m = _municipio(ev)
+
+    def linha(comp, n):
+        return c.get_json(LEITOS, {"co_ibge": m["ibge6"], "nu_comp": comp, "limit": 1, "offset": n}).get("cnes_leitos") or []
+
+    hoje, comp = datetime.now(), None
+    for k in range(1, 10):  # a competência mais recente costuma ter uns 4 meses de atraso
+        ano, mes = hoje.year, hoje.month - k
+        while mes <= 0:
+            ano, mes = ano - 1, mes + 12
+        if linha(ano * 100 + mes, 0):
+            comp = ano * 100 + mes
+            break
+    if not comp:
+        sys.exit("Sem leitos no CNES para este município nos últimos 9 meses (o município pode não ter hospital).")
+    regs, n, lote = {}, 0, 16
+    with ThreadPoolExecutor(max_workers=lote) as ex:
+        while n < _MAX_LEITOS:
+            paginas = list(ex.map(lambda i: linha(comp, i), range(n, n + lote)))
+            for p in paginas:
+                for r in p:
+                    regs[(r.get("co_cnes"), r.get("tp_leito"), r.get("ds_leito"))] = r
+            n += lote
+            if any(not p for p in paginas):
+                break
+    if n >= _MAX_LEITOS:
+        print("Aviso: contagem parcial (limite de linhas atingido).")
+    regs = list(regs.values())
+    periodo = f"{comp % 100:02d}/{comp // 100}"
+    fonte, link = "CNES/Ministério da Saúde, leitos", f"{LEITOS}?co_ibge={m['ibge6']}&nu_comp={comp}"
+
+    def q(r, k):
+        return int(r.get(k) or 0)
+
+    def tipo(r):
+        return str(r.get("tp_leito", "")).split("-")[0].strip()
+
+    def uti(r):
+        return "UTI" in str(r.get("ds_leito", "")).upper()
+
+    total, sus = sum(q(r, "qt_existente") for r in regs), sum(q(r, "qt_sus") for r in regs)
+    uti_sus = sum(q(r, "qt_sus") for r in regs if uti(r))
+    feitos = [
+        c.item(ev, "leitos_total", "Leitos existentes (públicos e privados)", total, "leitos", fonte, link, periodo, "api"),
+        c.item(ev, "leitos_sus", "Leitos disponíveis ao SUS", sus, "leitos", fonte, link, periodo, "api"),
+        c.item(ev, "leitos_uti", "Leitos de UTI existentes", sum(q(r, "qt_existente") for r in regs if uti(r)), "leitos", fonte, link, periodo, "api"),
+        c.item(ev, "leitos_uti_sus", "Leitos de UTI disponíveis ao SUS", uti_sus, "leitos", fonte, link, periodo, "api"),
+        c.item(ev, "leitos_estab", "Estabelecimentos com leitos", len({r.get("co_cnes") for r in regs}), "estabelecimentos", fonte, link, periodo, "api"),
+    ]
+    for cod, id_ in (("4", "leitos_obst_sus"), ("5", "leitos_ped_sus")):
+        feitos.append(c.item(ev, id_, f"Leitos {_TIPO_LEITO[cod].lower()} disponíveis ao SUS",
+                             sum(q(r, "qt_sus") for r in regs if tipo(r) == cod), "leitos", fonte, link, periodo, "api"))
+    if total:
+        feitos.append(c.item(ev, "leitos_sus_pct", "Parcela dos leitos disponível ao SUS", sus / total * 100, "%", "Cálculo sobre o CNES",
+                             link, periodo, "calculo", formula="leitos_sus / leitos_total × 100", depende_de=["leitos_sus", "leitos_total"]))
+    if sus:
+        filan = sum(q(r, "qt_sus") for r in regs if "SEM FINS" in str(r.get("no_grupo_nat_jur", "")).upper())
+        feitos.append(c.item(ev, "leitos_sus_filantropicos", "Leitos SUS em hospitais sem fins lucrativos (filantrópicos)", filan, "leitos",
+                             fonte, link, periodo, "api"))
+        feitos.append(c.item(ev, "leitos_sus_filantropicos_pct", "Parcela dos leitos SUS em hospitais filantrópicos", filan / sus * 100, "%",
+                             "Cálculo sobre o CNES", link, periodo, "calculo", formula="leitos_sus_filantropicos / leitos_sus × 100",
+                             depende_de=["leitos_sus_filantropicos", "leitos_sus"]))
+    pop = ev["itens"].get("pop")
+    if pop:
+        per = f"{periodo} (população {pop['periodo']})"
+        feitos.append(c.item(ev, "leitos_sus_mil_hab", "Leitos SUS por mil habitantes", sus / pop["valor"] * 1000, "por mil habitantes",
+                             "Cálculo sobre CNES e IBGE", link, per, "calculo", casas=2, formula="leitos_sus / pop × 1000",
+                             depende_de=["leitos_sus", "pop"]))
+        feitos.append(c.item(ev, "leitos_uti_sus_10mil_hab", "Leitos de UTI SUS por 10 mil habitantes", uti_sus / pop["valor"] * 10000,
+                             "por 10 mil habitantes", "Cálculo sobre CNES e IBGE", link, per, "calculo", casas=2,
+                             formula="leitos_uti_sus / pop × 10000", depende_de=["leitos_uti_sus", "pop"]))
+        if sus / pop["valor"] * 1000 > 3:
+            print("Aviso: muitos leitos SUS por habitante costuma indicar polo regional, que atende vizinhos. Diga isso ao comparar.")
+    por_tipo = {}
+    for r in regs:
+        nome = _TIPO_LEITO.get(tipo(r), "Outros")
+        por_tipo[nome] = por_tipo.get(nome, 0) + q(r, "qt_sus")
+    pontos = sorted(((k, v) for k, v in por_tipo.items() if v), key=lambda x: -x[1])
+    if pontos:
+        c.serie(ev, "leitos_sus_tipo", "Leitos disponíveis ao SUS, por tipo", "leitos", fonte, link, "api", pontos, periodo=periodo)
+    for f in feitos:
+        print(c.resumo(f))
+
+
+# ---------------------------------------------------------- planos de saúde (ANS)
+ANS_CSV = "https://dadosabertos.ans.gov.br/FTP/PDA/taxa_de_cobertura_de_planos_de_saude-047/pda-047-taxa_cobertura.csv"
+
+
+def _ans_arquivo():
+    """Baixa o CSV da ANS (cerca de 21 MB, todos os municípios) e guarda por 7 dias na pasta temporária."""
+    import json
+    import os
+    import shutil
+    import tempfile
+    import time
+    import urllib.request
+    pasta = os.path.join(tempfile.gettempdir(), "improve-saude")
+    os.makedirs(pasta, exist_ok=True)
+    arq, meta = os.path.join(pasta, "ans-taxa-cobertura.csv"), os.path.join(pasta, "ans-taxa-cobertura.json")
+    if not (os.path.exists(arq) and os.path.exists(meta) and time.time() - os.path.getmtime(arq) < 7 * 86400):
+        try:
+            req = urllib.request.Request(ANS_CSV, headers={"User-Agent": c.USER_AGENT})
+            with urllib.request.urlopen(req, timeout=300) as r, open(arq + ".tmp", "wb") as f:
+                shutil.copyfileobj(r, f)
+                modificado = r.headers.get("Last-Modified")
+        except Exception as e:
+            raise c.SemRede(f"Sem resposta de {ANS_CSV}: {e}")
+        os.replace(arq + ".tmp", arq)
+        with open(meta, "w", encoding="utf-8") as f:
+            json.dump({"last_modified": modificado}, f)
+    with open(meta, encoding="utf-8") as f:
+        return arq, json.load(f).get("last_modified")
+
+
+def cmd_planos(a, ev):
+    import csv
+    from email.utils import parsedate_to_datetime
+    m = _municipio(ev)
+    arq, modificado = _ans_arquivo()
+    benef = idosos = 0.0
+    ano = None
+    with open(arq, encoding="latin-1", newline="") as f:
+        for l in csv.DictReader(f, delimiter=";"):
+            if l.get("CD_MUNICIPIO") != m["ibge6"]:
+                continue
+            v = float((l.get("BENEF_ASSISTENCIA_MEDICA") or "0").replace(",", ".") or 0)
+            benef += v
+            if (l.get("FAIXA_ETARIA") or "").startswith(("60", "70", "80")):
+                idosos += v
+            ano = l.get("PERIODO")
+    if ano is None:
+        sys.exit("O arquivo da ANS não tem este município.")
+    # O arquivo traz só o ano; os beneficiários são os da data de atualização do conjunto (dicionário da ANS).
+    periodo = parsedate_to_datetime(modificado).strftime("%m/%Y") if modificado else str(ano)
+    fonte = "ANS, beneficiários de planos de saúde"
+    feitos = [c.item(ev, "ans_benef", "Beneficiários de planos de assistência médica", benef, "beneficiários", fonte, ANS_CSV, periodo, "api"),
+              c.item(ev, "ans_benef_60mais", "Beneficiários de planos com 60 anos ou mais", idosos, "beneficiários", fonte, ANS_CSV, periodo, "api")]
+    pop = ev["itens"].get("pop")
+    if pop:
+        per = f"{periodo} (população {pop['periodo']})"
+        cob = benef / pop["valor"] * 100
+        if cob > 100:
+            print("Aviso: mais beneficiários que moradores (planos de empresa registrados na sede). Não use a cobertura deste município.")
+        feitos += [
+            c.item(ev, "ans_cobertura_pct", "Parcela da população com plano de saúde", cob, "%", "Cálculo sobre ANS e IBGE", ANS_CSV, per,
+                   "calculo", formula="ans_benef / pop × 100", depende_de=["ans_benef", "pop"]),
+            c.item(ev, "sus_exclusivo_pct", "Parcela da população que depende só do SUS", max(0.0, 100 - cob), "%", "Cálculo sobre ANS e IBGE",
+                   ANS_CSV, per, "calculo", formula="100 − ans_benef / pop × 100", depende_de=["ans_benef", "pop"]),
+            c.item(ev, "pop_sus_exclusivo", "Moradores que dependem só do SUS", max(0.0, pop["valor"] - benef), "habitantes",
+                   "Cálculo sobre ANS e IBGE", ANS_CSV, per, "calculo", formula="pop − ans_benef", depende_de=["pop", "ans_benef"]),
+        ]
+    else:
+        print("Aviso: rode 'populacao' antes para calcular a cobertura.")
+    for f in feitos:
+        print(c.resumo(f))
+
+
+# ------------------------------------------- de onde vem o dinheiro da saúde (MSC)
+MSC = f"{SICONFI}/msc_orcamentaria"
+# Fontes de recursos padronizadas pela STN (Portaria 710/2021 e alterações; conferidas na IN TCE-PI 03/2022;
+# a 605, piso da enfermagem, é posterior). O 1º dígito diz o exercício (1 = deste ano, 2 = saldo de anos
+# anteriores); os três seguintes, a origem. O que não está aqui (659, convênios de outras entidades,
+# operações de crédito...) entra em "outras".
+_ORIGEM = {"500": "municipio", "501": "municipio",
+           "600": "uniao", "601": "uniao", "602": "uniao", "603": "uniao", "604": "uniao", "605": "uniao", "631": "uniao", "706": "uniao",
+           "621": "estado", "632": "estado", "710": "estado"}
+_ORIGEM_ROT = {"municipio": ("recursos do próprio município", "Município"), "uniao": ("recursos da União", "União"),
+               "estado": ("recursos do Estado", "Estado"), "outras": ("outras fontes", "Outras fontes")}
+
+
+def _msc(m, ano, mes):
+    itens, off = [], 0
+    while True:
+        params = {"id_ente": m["ibge"], "an_referencia": ano, "me_referencia": mes, "co_tipo_matriz": "MSCC",
+                  "classe_conta": 6, "id_tv": "ending_balance", "offset": off}
+        r = c.get_json(MSC, params, timeout=120)
+        itens += r.get("items", [])
+        if not r.get("hasMore") or not r.get("items"):
+            params.pop("offset")
+            return itens, params
+        off += len(r["items"])
+
+
+def cmd_financiamento(a, ev):
+    m = _municipio(ev)
+    hoje = datetime.now()
+    tentativas = [(a.ano, mes) for mes in range(12, 0, -1) if (a.ano, mes) < (hoje.year, hoje.month)] + [(a.ano - 1, 12)]
+    for ano, mes in tentativas:
+        itens, params = _msc(m, ano, mes)
+        # despesa liquidada (6221303, a pagar, + 6221304, paga) na função 10, saúde
+        saude = [i for i in itens if str(i.get("funcao") or "").lstrip("0") == "10"
+                 and str(i.get("conta_contabil", ""))[:7] in ("6221303", "6221304")]
+        if saude:
+            break
+    else:
+        sys.exit(f"A MSC de {a.ano} ainda não tem despesa em saúde para este município.")
+    soma = {"municipio": 0.0, "uniao": 0.0, "estado": 0.0, "outras": 0.0}
+    anteriores = emendas = 0.0
+    for i in saude:
+        f, v = str(i.get("fonte_recursos") or ""), float(i.get("valor") or 0)
+        cod = f[1:4] if len(f) >= 4 else ""
+        soma[_ORIGEM.get(cod, "outras")] += v
+        if f.startswith("2"):
+            anteriores += v
+        if cod in ("706", "710"):
+            emendas += v
+    total = sum(soma.values())
+    periodo = str(ano) if mes == 12 else f"{ano} (até {_MESES[mes - 1]})"
+    fonte, url = "Siconfi/Tesouro Nacional, MSC orçamentária", f"{MSC}?" + urllib.parse.urlencode(params)
+    feitos = [c.item(ev, "fin_saude_liq", "Despesa liquidada em saúde, segundo a MSC", total, "R$", fonte, url, periodo, "api")]
+    for k, v in soma.items():
+        nome = _ORIGEM_ROT[k][0]
+        feitos.append(c.item(ev, f"fin_{k}", f"Despesa em saúde financiada com {nome}", v, "R$", fonte, url, periodo, "api"))
+        feitos.append(c.item(ev, f"fin_{k}_pct", f"Parcela da despesa em saúde financiada com {nome}", v / total * 100, "%",
+                             "Cálculo sobre a MSC", url, periodo, "calculo",
+                             formula=f"fin_{k} / fin_saude_liq × 100", depende_de=[f"fin_{k}", "fin_saude_liq"]))
+    feitos.append(c.item(ev, "fin_anos_anteriores", "Despesa em saúde financiada com saldo de anos anteriores", anteriores, "R$",
+                         fonte, url, periodo, "api"))
+    if emendas:
+        feitos.append(c.item(ev, "fin_emendas_especiais", "Despesa em saúde financiada com transferências especiais (emendas)",
+                             emendas, "R$", fonte, url, periodo, "api"))
+    pontos = [(_ORIGEM_ROT[k][1], v) for k, v in sorted(soma.items(), key=lambda x: -x[1]) if v]
+    c.serie(ev, "fin_origem", "Despesa liquidada em saúde, por origem do recurso", "R$", fonte, url, "api", pontos, periodo=periodo)
+    for f in feitos:
+        print(c.resumo(f))
+
+
+def _svsa(ev, m):
+    """População por idade e sexo (SVSA/Ministério da Saúde)"""
+    url = f"{MS}/vigilancia-e-meio-ambiente/svsa-populacao-residente"
+    for ano in range(datetime.now().year, datetime.now().year - 4, -1):
+        # único endpoint da API que usa o código IBGE de 7 dígitos; com 6, volta vazio depois de ~40 s
+        linhas = c.get_json(url, {"cod_mun": m["ibge"], "ano": ano, "limit": 1000}).get("svsa_populacao_residente") or []
+        if linhas:
+            break
+    else:
+        return []
+    link = f"{url}?cod_mun={m['ibge']}&ano={ano}&limit=1000"
+    fonte = "Ministério da Saúde, população residente (SVSA)"
+
+    def soma(cond):
+        return sum(int(l.get("pop") or 0) for l in linhas if cond(int(l.get("idade") or 0), int(l.get("sexo") or 0)))
+
+    total = soma(lambda i, s: True)
+    idosos = soma(lambda i, s: i >= 60)  # a idade 80 reúne 80 anos ou mais
+    feitos = [
+        c.item(ev, "pop_svsa", "População residente estimada pelo Ministério da Saúde", total, "habitantes", fonte, link, ano, "api"),
+        c.item(ev, "pop_menor1", "Crianças com menos de 1 ano", soma(lambda i, s: i == 0), "habitantes", fonte, link, ano, "api"),
+        c.item(ev, "pop_60mais_svsa", "Pessoas com 60 anos ou mais (estimativa do Ministério da Saúde)", idosos, "habitantes", fonte, link, ano, "api"),
+        c.item(ev, "pop_mulheres_25a64", "Mulheres de 25 a 64 anos (público do preventivo)", soma(lambda i, s: s == 2 and 25 <= i <= 64),
+               "habitantes", fonte, link, ano, "api"),
+        c.item(ev, "pop_mulheres_50a69", "Mulheres de 50 a 69 anos (público da mamografia)", soma(lambda i, s: s == 2 and 50 <= i <= 69),
+               "habitantes", fonte, link, ano, "api"),
+    ]
+    if total:
+        feitos.append(c.item(ev, "pop_60mais_svsa_pct", "Parcela da população com 60 anos ou mais (estimativa do Ministério da Saúde)",
+                             idosos / total * 100, "%", "Cálculo sobre a população do Ministério da Saúde (SVSA)", link, ano, "calculo",
+                             formula="pop_60mais_svsa / pop_svsa × 100", depende_de=["pop_60mais_svsa", "pop_svsa"]))
+    return feitos
+
+
+def _pib(ev, m):
+    """PIB municipal (IBGE)"""
+    r = c.get_json(f"{IBGE}/v3/agregados/5938/periodos/-1/variaveis/37", {"localidades": f"N6[{m['ibge']}]"})
+    try:
+        serie_ = r[0]["resultados"][0]["series"][0]["serie"]
+    except (LookupError, TypeError):
+        return []
+    ano = max(serie_)
+    pib = _num(serie_[ano])
+    if pib is None:
+        return []
+    pib *= 1000  # a tabela vem em mil reais
+    link = f"{IBGE}/v3/agregados/5938/periodos/{ano}/variaveis/37?localidades=N6[{m['ibge']}]"
+    feitos = [c.item(ev, "pib", "Produto Interno Bruto do município", pib, "R$", "IBGE, PIB dos Municípios (tabela 5938)", link, ano, "api")]
+    # PIB per capita oficial do IBGE (IBGE Cidades, indicador 47001, série revisada). Não dá para calcular aqui:
+    # a tabela de estimativas (6579) não tem 2022 nem 2023, anos do PIB mais recente.
+    try:
+        rp = c.get_json(f"{IBGE}/v1/pesquisas/indicadores/47001/resultados/{m['ibge']}")
+        pc = {k: _num(v) for k, v in rp[0]["res"][0]["res"].items() if _num(v) is not None}
+    except (c.SemRede, LookupError, TypeError):
+        pc = {}
+    if pc:
+        a_pc = max(pc)
+        feitos.append(c.item(ev, "pib_per_capita", "PIB por habitante", pc[a_pc], "R$", "IBGE Cidades (PIB per capita)",
+                             f"{IBGE}/v1/pesquisas/indicadores/47001/resultados/{m['ibge']}", a_pc, "api", fmt="R$ " + c.fmt_num(pc[a_pc], 0)))
+    return feitos
+
+
+# ------------------------------------------------------ qualidade da água (Sisagua)
+SISAGUA = f"{MS}/sisagua/vigilancia-parametros-basicos"
+
+
+def cmd_agua(a, ev):
+    """Vigilância da qualidade da água: uma linha por análise (dado ambiental, sem pessoa).
+    Nesta API, `offset` é o número da página de até 1.000 linhas (testado em 25/11/2026)."""
+    m = _municipio(ev)
+    linhas, pag = [], 0
+    while pag < 200:
+        p = c.get_json(SISAGUA, {"codigo_ibge": m["ibge6"], "ano": a.ano, "limit": 1000, "offset": pag}).get("parametros") or []
+        linhas += p
+        if len(p) < 1000:
+            break
+        pag += 1
+    if not linhas:
+        sys.exit(f"O Sisagua não tem análises de vigilância da água em {a.ano} para este município.")
+    meses = {int(l["mes"]) for l in linhas if str(l.get("mes") or "").isdigit()}
+    periodo = str(a.ano) if a.ano < datetime.now().year or not meses else f"{a.ano} (até {_MESES[max(meses) - 1]})"
+    fonte, link = "Ministério da Saúde, Sisagua (vigilância)", f"{SISAGUA}?codigo_ibge={m['ibge6']}&ano={a.ano}"
+    feitos = [c.item(ev, "agua_analises", "Análises de vigilância da qualidade da água", len(linhas), "análises", fonte, link, periodo, "api")]
+    for nome, id_ in (("Coliformes totais", "agua_coliformes"), ("Escherichia coli", "agua_ecoli")):
+        sel = [l for l in linhas if str(l.get("parametro", "")).strip().lower() == nome.lower()]
+        pres = sum(1 for l in sel if str(l.get("resultado", "")).strip().upper() == "PRESENTE")
+        rot, pres_txt = ("coliformes totais", "presentes") if id_ == "agua_coliformes" else ("E. coli", "presente")
+        feitos += [c.item(ev, f"{id_}_analises", f"Análises de {rot}", len(sel), "análises", fonte, link, periodo, "api"),
+                   c.item(ev, f"{id_}_presente", f"Análises com {rot} {pres_txt}", pres, "análises", fonte, link, periodo, "api")]
+        if sel:
+            feitos.append(c.item(ev, f"{id_}_pct", f"Parcela das análises com {rot} {pres_txt}", pres / len(sel) * 100, "%",
+                                 "Cálculo sobre o Sisagua", link, periodo, "calculo", formula=f"{id_}_presente / {id_}_analises × 100",
+                                 depende_de=[f"{id_}_presente", f"{id_}_analises"], **c.instavel(len(sel))))
+    for f in feitos:
+        print(c.resumo(f))
 
 
 def main():
@@ -671,6 +1047,10 @@ def main():
     s = sub.add_parser("siops"); s.add_argument("--ano", type=int, required=True)
     s = sub.add_parser("repasses"); s.add_argument("--ano", type=int, required=True)
     sub.add_parser("contexto")
+    sub.add_parser("leitos")
+    sub.add_parser("planos")
+    s = sub.add_parser("agua"); s.add_argument("--ano", type=int, required=True)
+    s = sub.add_parser("financiamento"); s.add_argument("--ano", type=int, required=True)
     a = p.parse_args()
     if a.cmd == "municipio" and not (a.nome or a.ibge):
         p.error("informe --nome (com --uf) ou --ibge")
@@ -678,7 +1058,8 @@ def main():
     try:
         {"municipio": cmd_municipio, "populacao": cmd_populacao, "financas": cmd_financas,
          "cnes": cmd_cnes, "arbovirose": cmd_arbovirose, "aps": cmd_aps, "siops": cmd_siops,
-         "repasses": cmd_repasses, "contexto": cmd_contexto}[a.cmd](a, ev)
+         "repasses": cmd_repasses, "contexto": cmd_contexto,
+         "leitos": cmd_leitos, "planos": cmd_planos, "agua": cmd_agua, "financiamento": cmd_financiamento}[a.cmd](a, ev)
     except c.SemRede as e:
         sys.exit(f"FONTE INDISPONÍVEL: {e}\nSe o ambiente bloqueia a internet (chat na nuvem ou Codex com a rede desligada), "
                  "peça acesso à rede se puder; se não, siga só com os arquivos enviados e diga isso no documento.")

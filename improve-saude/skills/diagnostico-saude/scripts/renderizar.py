@@ -263,6 +263,10 @@ def fontes_de(ins, ev):
     ids += g.get("itens") or []
     if g.get("serie"):
         ids.append(g["serie"])
+    for campo in ("achado", "implicacao", "cruzamento", "limites"):  # números citados no texto também têm fonte
+        ids += [mt.group(1) for mt in MARCADOR.finditer(str(ins.get(campo) or ""))]
+    for acao in ins.get("acoes") or []:
+        ids += [mt.group(1) for mt in MARCADOR.finditer(str(acao))]
     while ids:
         i = ids.pop(0)
         e = ev["itens"].get(i) or ev["series"].get(i)
@@ -393,8 +397,12 @@ def rastro(doc, ev):
             if not e:
                 continue
             pts = [p for p in e["pontos"] if isinstance(p["valor"], (int, float))]
-            lo, hi = min(pts, key=lambda p: p["valor"]), max(pts, key=lambda p: p["valor"])
+            lo, hi = (min(pts, key=lambda p: p["valor"]), max(pts, key=lambda p: p["valor"])) if pts else (None, None)
             valor = f"{lo['fmt']} a {hi['fmt']}" if pts else "série vazia"
+            # série por categoria (tipo de leito, origem do recurso, UBS) em reais ou contagem: o total diz mais que o intervalo
+            no_tempo = all(re.fullmatch(r"[\d/ -]+", str(p["periodo"])) for p in pts)
+            if pts and not no_tempo and e.get("unidade") != "%" and "por " not in str(e.get("unidade")):
+                valor = c.formatar(sum(p["valor"] for p in pts), e.get("unidade"))
             if e["pontos"] and not e.get("periodo"):
                 e = {**e, "periodo": f"{e['pontos'][0]['periodo']} a {e['pontos'][-1]['periodo']}"}
         origem = ORIGEM.get(e["origem"], e["origem"])

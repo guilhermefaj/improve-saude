@@ -106,20 +106,25 @@ Escolha as fontes pelo [mapa de dores](references/mapa-dores.md). O município v
 ```
 python scripts/fontes.py municipio --nome "Pouso Alegre" --uf MG
 python scripts/fontes.py populacao
-python scripts/fontes.py financas --ano 2025      # Siconfi: % em saúde, despesa por área, pessoal/RCL, emendas
+python scripts/fontes.py financas --ano 2025      # Siconfi: % em saúde, despesa por área, pessoal/RCL, emendas, restos a pagar
 python scripts/fontes.py cnes                     # rede: UBS, hospitais, UPA, CAPS
 python scripts/fontes.py arbovirose --ano 2026    # InfoDengue: casos, alerta, clima
 python scripts/fontes.py aps                      # cobertura da atenção primária, repasse federal e descontos
 python scripts/fontes.py siops --ano 2025         # SIOPS: gasto por habitante, pessoal, medicamentos, terceiros
 python scripts/fontes.py repasses --ano 2025      # FNS: repasses federais por bloco (MAC, APS, vigilância)
-python scripts/fontes.py contexto                 # IBGE: saneamento, envelhecimento, mortalidade infantil
+python scripts/fontes.py contexto                 # IBGE e MS: saneamento, idade, público-alvo, mortalidade infantil, PIB
+python scripts/fontes.py leitos                   # CNES: leitos SUS, UTI, filantrópicos (capital leva cerca de 1 min)
+python scripts/fontes.py planos                   # ANS: quem tem plano e quantos dependem só do SUS
+python scripts/fontes.py financiamento --ano 2025 # MSC: quanto da saúde o município, a União e o Estado pagam
+python scripts/fontes.py agua --ano 2025          # Sisagua: análises da água com coliformes e E. coli
 ```
 
-Rode só o que a dor pede; o [mapa de dores](references/mapa-dores.md) diz quais. Três cuidados:
+Rode só o que a dor pede; o [mapa de dores](references/mapa-dores.md) diz quais. `populacao` vem antes de `leitos` e `planos`, que usam a população nas contas. Quatro cuidados:
 
 - O dado da APS chega com cerca de 3 meses de atraso e o período sai no resumo. A API não diz o motivo do desconto no repasse: não invente um; sugira conferir no e-Gestor ou no relatório do site.
 - SIOPS, Siconfi e FNS medem o gasto de jeitos diferentes. Não some nem compare números de fontes diferentes como se fossem a mesma conta; se divergirem, isso pode virar um alerta, com a explicação.
 - O Censo é de 2022 e o IDHM é de 2010. Diga o ano no texto quando usar.
+- Leitos por habitante de um polo regional atendem também os vizinhos: não compare com a média como se fossem só dos moradores.
 
 Se o município for ambíguo, o script lista os candidatos: pergunte qual é. Se uma fonte falhar, siga com as outras e registre a limitação no campo `limites` do insight. Se a falha for de rede e o ambiente permitir pedir acesso à internet (no Codex, por exemplo), peça antes de desistir. Se **nenhuma** fonte responder, siga só com arquivos e relatos, e diga isso na capa em `contexto.fontes_cruzadas` ("Sem acesso às fontes públicas nesta sessão").
 
