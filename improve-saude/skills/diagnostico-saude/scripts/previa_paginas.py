@@ -114,7 +114,9 @@ def main():
         feitas = gerar_previa(a.html, a.pasta)
     except Exception as e:  # noqa: BLE001
         print(f"Não consegui gerar a prévia: {e}")
-        print("Se você consegue ler PDF, faça a revisão visual direto no diagnostico.pdf.")
+        if navegadores():
+            print(_comum.PEDIR_NAVEGADOR)
+        print("Sem o navegador: se você consegue ler PDF, faça a revisão visual direto no diagnostico.pdf.")
         sys.exit(2)
     print("Prévia das páginas (abra cada imagem e confira a lista do passo 8):")
     for caminho, nome, paginas in feitas:

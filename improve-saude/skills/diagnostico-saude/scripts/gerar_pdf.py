@@ -98,7 +98,12 @@ def main():
     print("Não consegui gerar o PDF aqui:")
     for e in erros or ["nenhum Chrome, Edge ou Chromium encontrado (defina CHROME_PATH)"]:
         print(f"  - {e}")
-    print(f"O HTML está pronto em {os.path.abspath(a.html)}. Abra no navegador e use Imprimir > Salvar como PDF.")
+    if lista:
+        print(_comum.PEDIR_NAVEGADOR)
+        print(f"Só se a liberação for recusada: o HTML está pronto em {os.path.abspath(a.html)}; "
+              "abra no navegador e use Imprimir > Salvar como PDF.")
+    else:
+        print(f"O HTML está pronto em {os.path.abspath(a.html)}. Abra no navegador e use Imprimir > Salvar como PDF.")
     sys.exit(2)
 
 

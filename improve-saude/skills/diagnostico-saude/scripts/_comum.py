@@ -22,7 +22,7 @@ try:  # Windows usa cp1252 no console; sem isso os acentos quebram
 except Exception:
     pass
 
-VERSAO = "0.6.1"  # versão do plugin; aparece na nota final do PDF
+VERSAO = "0.6.2"  # versão do plugin; aparece na nota final do PDF
 USER_AGENT = f"improve-saude/{VERSAO} (+https://improve.business)"
 VERSAO_EVIDENCIAS = 1
 MINIMO_ESTAVEL = 20  # abaixo disso, uma taxa muda muito com um caso a mais ou a menos
@@ -34,6 +34,19 @@ def instavel(n):
         return {}
     return {"instavel": f"calculado sobre {fmt_num(n)} caso{'' if n == 1 else 's'}; com menos de {MINIMO_ESTAVEL}, "
                         "um caso a mais ou a menos muda muito o resultado"}
+
+
+# --------------------------------------------------------------------- sandbox
+# Agentes como o Codex rodam os comandos num sandbox que pode bloquear o navegador e a internet.
+# A saída é pedir a liberação do próprio comando na hora: a pessoa só aprova, sem configurar nada.
+PEDIR_NAVEGADOR = ("O navegador existe, mas não abriu: em geral é o sandbox do agente (no Codex, por exemplo). "
+                   "Rode este mesmo comando de novo agora, pedindo para rodar fora do sandbox (no Codex: permissão elevada), "
+                   "com a justificativa \"abrir o navegador da máquina para montar o diagnóstico\". Não pergunte antes à pessoa: "
+                   "o pedido de aprovação já é a pergunta. Só siga sem o navegador se isso falhar ou for recusado.")
+PEDIR_REDE = ("Se for o sandbox do agente (no Codex, por exemplo), rode este mesmo comando de novo agora, pedindo acesso "
+              "à rede ou para rodar fora do sandbox, com a justificativa \"consultar dados públicos do município\". "
+              "Não pergunte antes à pessoa: o pedido de aprovação já é a pergunta. Só siga sem as fontes públicas "
+              "se isso falhar ou for recusado, e diga isso no documento.")
 
 
 # --------------------------------------------------------------------- rede

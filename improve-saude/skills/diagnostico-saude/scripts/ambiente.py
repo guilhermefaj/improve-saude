@@ -28,8 +28,10 @@ def main():
             continue
     if pdf:
         print(f"- Navegador para o PDF: ok ({pdf})")
+    elif navegadores():
+        print("- Navegador para o PDF: existe, mas não abriu. " + c.PEDIR_NAVEGADOR)
     else:
-        print("- Navegador para o PDF: não encontrado ou não abre aqui. Entregue o HTML e explique: "
+        print("- Navegador para o PDF: não encontrado. Entregue o HTML e explique: "
               "abrir no navegador e usar Imprimir > Salvar como PDF.")
 
     try:
@@ -38,9 +40,7 @@ def main():
         print("- Fontes públicas (internet): ok")
     except c.SemRede:
         rede = False
-        print("- Fontes públicas (internet): bloqueadas. Se o ambiente permitir, peça acesso à rede "
-              "(no Codex: aprovar o comando ou network_access = true). Se não, siga só com arquivos e relatos "
-              "e diga isso na capa.")
+        print("- Fontes públicas (internet): bloqueadas. " + c.PEDIR_REDE)
 
     caminho = ("completo" if (rede and pdf) else
                "sem dados públicos" if pdf else

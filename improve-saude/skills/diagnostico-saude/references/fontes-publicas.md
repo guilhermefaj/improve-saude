@@ -53,7 +53,7 @@ Quando a dor pede um dado sem acesso automático, diga à pessoa exatamente o qu
 `fontes.py` avisa com uma mensagem clara quando não alcança a fonte. O que fazer depende do ambiente:
 
 - **Claude Code e Cowork:** a rede costuma estar liberada.
-- **Codex:** o modo padrão desliga a rede dos comandos. Peça para rodar `fontes.py` com acesso à internet (a pessoa aprova na hora) ou explique como liberar de vez, no `~/.codex/config.toml`:
+- **Codex:** o modo padrão desliga a rede dos comandos. Rode `fontes.py` de novo pedindo a liberação (permissão elevada); a pessoa aprova na hora, sem configurar nada. Só se ela quiser liberar de vez, mostre o ajuste no `~/.codex/config.toml`:
 
   ```toml
   [sandbox_workspace_write]

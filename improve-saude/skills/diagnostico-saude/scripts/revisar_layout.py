@@ -212,7 +212,9 @@ def main():
         m = medir(a.html)
     except Exception as e:  # noqa: BLE001
         print(f"Não consegui medir o layout: {e}")
-        print("Faça a revisão só pelo olho, página por página.")
+        if navegadores():
+            print(_comum.PEDIR_NAVEGADOR)
+        print("Sem o navegador, faça a revisão só pelo olho, página por página.")
         sys.exit(2)
     if a.json:
         print(json.dumps(m, ensure_ascii=False, indent=1))
@@ -238,7 +240,10 @@ def main():
         for caminho, nome, _ in feitas:
             print(f"  - {caminho}  {nome}")
     except Exception as e:  # noqa: BLE001
-        print(f"Não consegui gerar a prévia em PNG ({e}). Faça a revisão visual direto no PDF, página por página.")
+        print(f"Não consegui gerar a prévia em PNG ({e}).")
+        if navegadores():
+            print(_comum.PEDIR_NAVEGADOR)
+        print("Sem o navegador, faça a revisão visual direto no PDF, página por página.")
 
 
 if __name__ == "__main__":

@@ -34,10 +34,12 @@ A skill segue o padrão aberto Agent Skills e funciona em qualquer agente que ro
 | Ambiente | Fontes públicas | PDF |
 |---|---|---|
 | Claude Code, Cowork | costumam funcionar | navegador da máquina |
-| Codex (CLI, app ou IDE) | a rede vem desligada; peça para rodar `fontes.py` com acesso à internet ou explique como liberar (ver [fontes-publicas.md](references/fontes-publicas.md)) | navegador da máquina |
+| Codex (CLI, app ou IDE) | o sandbox desliga a rede: rode `fontes.py` pedindo a liberação | navegador da máquina, também pedindo a liberação |
 | Chat na nuvem (Claude.ai, ChatGPT) | quase sempre bloqueadas | em geral não há navegador: entregue o HTML |
 
-Em qualquer ambiente, se uma etapa não for possível, siga com o que der e diga o que faltou. Nunca invente o número que a etapa traria.
+**Bloqueio do sandbox.** No Codex e em outros agentes com sandbox, os comandos que abrem o navegador (`ambiente.py`, `gerar_pdf.py`, `revisar_layout.py`, `previa_paginas.py`) ou a internet (`fontes.py`) podem falhar na primeira vez. Quando o script disser que o navegador existe mas não abriu, ou que a fonte não respondeu, rode o mesmo comando de novo na hora, pedindo para sair do sandbox (no Codex, a permissão elevada), com uma justificativa curta: "abrir o navegador da máquina para montar o diagnóstico" ou "consultar dados públicos do município". Não pare para perguntar nem explique configuração: o pedido de aprovação já é a pergunta, e a pessoa só clica. Nada sai da máquina além das consultas às fontes públicas.
+
+Em qualquer ambiente, se uma etapa não for possível mesmo assim, siga com o que der e diga o que faltou. Nunca invente o número que a etapa traria.
 
 ## Fluxo
 
@@ -47,7 +49,7 @@ Em qualquer ambiente, se uma etapa não for possível, siga com o que der e diga
 python scripts/ambiente.py
 ```
 
-Em poucos segundos, diz se há navegador para o PDF e internet para as fontes públicas, e qual caminho é possível nesta sessão. Siga esse caminho; não insista no que o ambiente não tem.
+Em poucos segundos, diz se há navegador para o PDF e internet para as fontes públicas, e qual caminho é possível nesta sessão. Se o bloqueio for do sandbox, peça a liberação como explicado acima e rode de novo. Fora isso, siga o caminho indicado; não insista no que o ambiente não tem.
 
 ### Quando a pessoa chega sem contar nada
 
@@ -128,7 +130,7 @@ Rode só o que a dor pede; o [mapa de dores](references/mapa-dores.md) diz quais
 - O Censo é de 2022 e o IDHM é de 2010. Diga o ano no texto quando usar.
 - Leitos por habitante de um polo regional atendem também os vizinhos: não compare com a média como se fossem só dos moradores.
 
-Se o município for ambíguo, o script lista os candidatos: pergunte qual é. Se uma fonte falhar, siga com as outras e registre a limitação no campo `limites` do insight. Se a falha for de rede e o ambiente permitir pedir acesso à internet (no Codex, por exemplo), peça antes de desistir. Se **nenhuma** fonte responder, siga só com arquivos e relatos, e diga isso na capa em `contexto.fontes_cruzadas` ("Sem acesso às fontes públicas nesta sessão").
+Se o município for ambíguo, o script lista os candidatos: pergunte qual é. Se uma fonte falhar, siga com as outras e registre a limitação no campo `limites` do insight. Se a falha for de rede num agente com sandbox, rode o comando de novo pedindo a liberação antes de desistir. Se **nenhuma** fonte responder, siga só com arquivos e relatos, e diga isso na capa em `contexto.fontes_cruzadas` ("Sem acesso às fontes públicas nesta sessão").
 
 ### 4. Calcular e registrar relatos
 
@@ -177,7 +179,7 @@ python scripts/gerar_pdf.py
 
 - Se a checagem reprovar, corrija o texto (ou crie a evidência que falta) e rode de novo. Nunca use `--sem-checagem` para entregar.
 - Os arquivos saem com o nome do município: `diagnostico-pouso-alegre.html` e `.pdf`.
-- `gerar_pdf.py` usa o Chrome, o Edge ou o Chromium da própria máquina; o documento não vai para servidor nenhum. Se nenhum navegador funcionar, pule para o passo 9 com o HTML e explique: abrir no navegador e usar Imprimir > Salvar como PDF.
+- `gerar_pdf.py` usa o Chrome, o Edge ou o Chromium da própria máquina; o documento não vai para servidor nenhum. Se o navegador não abrir por causa do sandbox, rode de novo pedindo a liberação. Só se nenhum navegador funcionar, pule para o passo 9 com o HTML e explique: abrir no navegador e usar Imprimir > Salvar como PDF.
 
 ### 8. Revisar o layout (obrigatório)
 
