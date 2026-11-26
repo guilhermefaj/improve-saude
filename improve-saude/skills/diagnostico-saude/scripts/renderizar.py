@@ -35,7 +35,7 @@ ORIGEM = {"api": "Dado público", "arquivo": "Arquivo da secretaria", "calculo":
 SITE = "https://improve.business"
 EMAIL = "contato@improve.business"
 # Deixa claro que o documento não é um trabalho contratado da Improve.
-AVISO = ("Diagnóstico gerado automaticamente e de graça pelo plugin Improve · Saúde Pública, a partir de uma conversa "
+AVISO = ("Relatório gerado automaticamente e de graça pelo plugin Improve · Saúde Pública, a partir de uma conversa "
          "curta e dos dados enviados. Não é uma consultoria contratada nem foi revisado pela equipe da Improve Business.")
 MESES = ["janeiro", "fevereiro", "março", "abril", "maio", "junho", "julho", "agosto", "setembro", "outubro", "novembro", "dezembro"]
 
@@ -482,7 +482,7 @@ def fontes_de(ins, ev):
 # ------------------------------------------------------------------ blocos
 def topo(municipio, titulo, logo):
     img = '<span class="logo" role="img" aria-label="Improve"></span>' if logo else ""
-    return (f'<header class="topo"><div><span class="kicker">{esc(municipio)} · Diagnóstico de Saúde Pública</span>'
+    return (f'<header class="topo"><div><span class="kicker">{esc(municipio)} · Relatório Inteligente de Saúde Pública</span>'
             f'<h2>{esc(titulo)}</h2></div>{img}</header>')
 
 
@@ -755,7 +755,7 @@ def render(doc, ev):
         for i in ins[:3])
     capa = f"""<section class="pagina capa" data-nome="Capa" data-paginas="1">{marca}
   <div class="capa-topo">{f'<img class="logo-capa" src="{logo}" alt="Improve">' if logo else ''}
-    <span class="kicker">Diagnóstico de Saúde Pública · {esc(data_extenso())}</span></div>
+    <span class="kicker">Relatório Inteligente de Saúde Pública · {esc(data_extenso())}</span></div>
   <h1>{esc(municipio)}</h1><div class="sub">{sub}</div>
   <h3 class="manchete">{texto(doc["titulo"], it)}</h3>
   {f'<p class="sub">{texto(doc["subtitulo"], it)}</p>' if doc.get("subtitulo") else ""}
@@ -780,7 +780,7 @@ def render(doc, ev):
     hip = doc.get("hipoteses") or []
     per = doc.get("perguntas") or []
     prox = doc.get("proximos_passos") or []
-    convite = (f'<div class="convite"><h3>Quer aprofundar este diagnóstico?</h3>'
+    convite = (f'<div class="convite"><h3>Quer aprofundar este relatório?</h3>'
                f'<p>A Improve Business ajuda secretarias de saúde a transformar dados em decisões e resultados. '
                f'Fale com a gente: <a href="mailto:{EMAIL}">{EMAIL}</a> · <a href="{SITE}">improve.business</a></p></div>') if doc.get("convite", True) else ""
     titulo_fim = ("Outros sinais, hipóteses e próximos passos" if comp else "Hipóteses, perguntas e próximos passos")
@@ -806,7 +806,7 @@ def render(doc, ev):
     css = CSS + (f":root {{ --logo: url('{logo}'); }}" if logo else "")
     for k, v in C.items():
         css = css.replace(f"__{k}__", v)
-    titulo = f"Diagnóstico de Saúde Pública · {municipio}"
+    titulo = f"Relatório Inteligente de Saúde Pública · {municipio}"
     return (f'<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><title>{esc(titulo)}</title>'
             f'<meta name="viewport" content="width=device-width, initial-scale=1"><style>{css}</style></head><body>{"".join(paginas)}</body></html>')
 

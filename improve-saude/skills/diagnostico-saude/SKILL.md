@@ -55,7 +55,7 @@ Em poucos segundos, diz se há navegador para o PDF e internet para as fontes p�
 
 Muita gente abre a skill sem saber o que ela faz: chama pelo nome, diz "oi", pede "um diagnóstico" sem dizer de onde ou pergunta "como funciona?". Não espere que ela adivinhe. Depois do passo 0, responda numa mensagem só, curta, com quatro partes:
 
-1. **O que você faz, numa frase.** Por exemplo: "Monto um diagnóstico da saúde do seu município: você me conta o que está pegando, eu cruzo com dados públicos e com as planilhas que você tiver e devolvo um PDF curto, com o achado mais importante em destaque e ações para começar."
+1. **O que você faz, numa frase.** Por exemplo: "Monto um relatório inteligente da saúde do seu município: você me conta o que está pegando, eu cruzo com dados públicos e com os arquivos que você tiver e devolvo um PDF direto ao ponto, com o achado mais importante em destaque e ações para começar."
 2. **Três jeitos de começar**, como frases que ela pode copiar e completar. Se souber o cargo dela, escolha frases do dia a dia desse cargo; se não, use estas:
    - "A fila de especialidades em [município] não para de crescer."
    - "Preciso mostrar ao prefeito para onde vai o dinheiro da saúde."
@@ -63,7 +63,7 @@ Muita gente abre a skill sem saber o que ela faz: chama pelo nome, diz "oi", ped
 3. **O que ajuda ter à mão**, sem exigir nada: o município e a UF e, se tiver, uma planilha (atendimentos, fila, faltas, uma exportação do TabNet). Se der para tirar as colunas de nome e CPF antes, melhor; se vierem, você não as usa.
 4. **Um atalho:** "Se preferir, me diga só o município e eu começo com um retrato a partir de dados públicos (população, gasto em saúde e quem o financia, atenção primária, repasses federais, rede de unidades, leitos, planos de saúde, dengue). A gente escolhe o foco a partir dele."
 
-Diga em meia frase que o diagnóstico é automático e gratuito, e feche com uma pergunta só: "Qual é o município e o que mais está pegando aí?". Se o passo 0 mostrou que não há internet, troque o atalho por "me conte o problema e mande o que tiver" e não prometa dados públicos.
+Diga em meia frase que o relatório é automático e gratuito, e feche com uma pergunta só: "Qual é o município e o que mais está pegando aí?". Se o passo 0 mostrou que não há internet, troque o atalho por "me conte o problema e mande o que tiver" e não prometa dados públicos.
 
 Se ela escolher o atalho, rode o passo 3, mostre em quatro ou cinco linhas o que chamou atenção, cada número vindo das evidências, e pergunte qual desses pontos interessa mais, ou se a dor é outra. O retrato é conversa, não documento: o PDF vem depois que o foco estiver escolhido.
 
