@@ -5,11 +5,11 @@
   </picture>
 </p>
 
-<h1 align="center">Diagnóstico de Saúde Pública</h1>
+<h1 align="center">Relatório Inteligente de Saúde Pública</h1>
 
 <p align="center">
-  Você conta o problema da saúde do seu município e envia as planilhas que tiver.<br>
-  O assistente cruza tudo com dados públicos e devolve um PDF curto, com o que mais importa na frente.
+  Você conta o problema da saúde do seu município e envia os arquivos que tiver.<br>
+  O assistente cruza tudo com dados públicos e devolve um PDF direto ao ponto, com o que mais importa na frente.
 </p>
 
 <p align="center">
@@ -37,7 +37,7 @@
 flowchart TB
   subgraph voce["O que você traz"]
     A1["A dor, contada<br>na conversa"]
-    A2["Planilhas<br>CSV ou Excel"]
+    A2["Arquivos<br>planilhas, PDFs e relatórios"]
   end
   subgraph fontes["Dados públicos do município, consultados na hora"]
     F1["IBGE<br>população, Censo e PIB"]
@@ -95,7 +95,7 @@ flowchart TB
 
 **Instalar.** Nas configurações de plugins, adicione o marketplace `guilhermefaj/improve-saude` e instale **improve-saude**.
 
-**Usar.** Escolha a pasta onde quer guardar os relatórios, conte o problema e anexe as planilhas.
+**Usar.** Escolha a pasta onde quer guardar os relatórios, conte o problema e anexe os arquivos que tiver.
 
 **Resultado.** O PDF e o HTML ficam na pasta escolhida.
 
@@ -132,7 +132,7 @@ network_access = true
 1. Baixe [diagnostico-saude.zip](https://github.com/guilhermefaj/improve-saude/releases/latest/download/diagnostico-saude.zip).
 2. Em **Configurações > Capacidades**, ative a execução de código e envie o `.zip` em **Skills**.
 
-**Usar.** Numa conversa nova, conte o problema e anexe as planilhas.
+**Usar.** Numa conversa nova, conte o problema e anexe os arquivos que tiver.
 
 **Resultado.** Um HTML para baixar. Abra no navegador e use **Imprimir > Salvar como PDF**. Aqui o ambiente costuma bloquear os sites do governo, então o documento usa só os seus arquivos e o que você contou, e avisa isso.
 
@@ -146,7 +146,7 @@ network_access = true
 1. Baixe [diagnostico-saude.zip](https://github.com/guilhermefaj/improve-saude/releases/latest/download/diagnostico-saude.zip), o mesmo do Claude.ai.
 2. Abra **Skills**, escolha **Create > Upload from your computer** e envie o `.zip`.
 
-**Usar e resultado.** Iguais aos do Claude.ai: você conta o problema, anexa as planilhas e recebe um HTML para salvar como PDF, feito só com os seus arquivos.
+**Usar e resultado.** Iguais aos do Claude.ai: você conta o problema, anexa os arquivos e recebe um HTML para salvar como PDF, feito só com os seus arquivos.
 
 </details>
 
