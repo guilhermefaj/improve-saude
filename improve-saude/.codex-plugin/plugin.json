@@ -1,6 +1,6 @@
 {
   "name": "improve-saude",
-  "version": "0.6.3",
+  "version": "0.6.4",
   "description": "Relatório inteligente de saúde pública municipal: conversa com o gestor, lê os arquivos dele sem expor dados pessoais, cruza com dados públicos (IBGE, Siconfi, SIOPS, Fundo Nacional de Saúde, atenção primária, CNES, ANS, Sisagua, InfoDengue) e entrega um PDF com insights práticos e o gráfico certo para cada um, com a marca Improve Business.",
   "author": {
     "name": "Improve Business",
@@ -13,7 +13,7 @@
   "keywords": ["saúde pública", "SUS", "município", "gestão", "diagnóstico", "dados abertos"],
   "skills": "./skills/",
   "interface": {
-    "displayName": "Improve · Saúde Pública",
+    "displayName": "Relatório Inteligente de Saúde Pública",
     "shortDescription": "Diagnóstico de saúde do município em PDF, com dados públicos.",
     "longDescription": "Para quem trabalha na gestão da saúde de um município. Você conta o problema e envia seus arquivos (planilhas, PDFs, relatórios); o Codex lê tudo sem expor dados pessoais, cruza com IBGE, Tesouro (Siconfi), SIOPS, Fundo Nacional de Saúde, Relatório Público da APS, CNES, ANS, Sisagua e InfoDengue e entrega um PDF direto ao ponto, com o achado mais importante em destaque e um gráfico para cada achado.",
     "developerName": "Improve Business",

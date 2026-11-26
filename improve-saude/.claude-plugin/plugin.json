@@ -1,6 +1,7 @@
 {
   "name": "improve-saude",
-  "version": "0.6.3",
+  "displayName": "Relatório Inteligente de Saúde Pública",
+  "version": "0.6.4",
   "description": "Relatório inteligente de saúde pública municipal: conversa com o gestor, lê os arquivos dele sem expor dados pessoais, cruza com dados públicos (IBGE, Siconfi, SIOPS, Fundo Nacional de Saúde, atenção primária, CNES, ANS, Sisagua, InfoDengue) e entrega um PDF com insights práticos e o gráfico certo para cada um, com a marca Improve Business.",
   "author": {
     "name": "Improve Business",
